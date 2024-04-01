@@ -1,3 +1,4 @@
+using ABI.System.Collections.Generic;
 using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
 using OperationsResearch.Services;
@@ -39,25 +40,9 @@ public sealed partial class MainWindow : Window
         //InitialValues.Rows.Add(new List<object>() { 1, 2, 10 });
         //InitialValues.Rows.Add(new List<object>() { 50, 100 });
     }
-
-    // BUTTON CLICK EVENTS
-    private void ShowInitialTableButton_Click(object sender, RoutedEventArgs e)
+    private List<Vector3> GetPivotPlan(TransportProblemTable Values)
     {
-        LogService.Log(InitialValues.ToLongString());
-    }
-    private void ShowLabInfoButton_Click(object sender, RoutedEventArgs e)
-    {
-        LogService.Log("Лабораторная работа по Исследованию операций №1\nФомин Н. А.\nВПР22");
-    }
-    private void SolveButton_Click(object sender, RoutedEventArgs e)
-    {
-        // Получим копию нормализованной исходной таблицы
-        var Values = InitialValues.Normalized();
-
-        // Найдем опорный план
-        LogService.Log("Найдём опорный план");
-
-        List<Vector2> path = new();
+        List<Vector3> path = new();
 
         var x = 0;
         var y = 0;
@@ -90,20 +75,56 @@ public sealed partial class MainWindow : Window
 
             LogService.Log("Результат:\n" + Values.ToLongString());
 
-            path.Add(new(x, y));
+            path.Add(new(x, y, min));
 
             x++;
             if (x >= Values.Rows[^1].Count) { x--; y++; }
             if (y >= Values.Rows.Count - 1) break;
 
             var toForceBreak = false;
-            var v = Values.Rows.Count;
             while (Values.Capacity[y] <= 0) { y++; LogService.Log($"{y}"); if (y >= Values.Rows.Count - 1) { toForceBreak = true; break; } }
             if (toForceBreak) break;
         }
 
-        var s = "Найденный опорный план:";
-        path.ForEach(x => s += $"\n({x.Y+1}, {x.X+1})");
-        LogService.Log(s);
+        return path;
+    }
+    private string GetV3ListStack(List<Vector3> list, string title)
+    {
+        var s = title;
+        list.ForEach(x => s += $"\n({x.Y + 1}, {x.X + 1}, {x.Z})");
+        return s;
+    }
+    private int GetTargetFuncValue(TransportProblemTable table, List<Vector3> path)
+    {
+        var sum = 0;
+        foreach (var vec in path)
+        {
+            sum += (int)vec.Z * (int)table.Rows[(int)vec.Y][(int)vec.X];
+        }
+        return sum;
+    }
+
+    // BUTTON CLICK EVENTS
+    private void ShowInitialTableButton_Click(object sender, RoutedEventArgs e)
+    {
+        LogService.Log(InitialValues.ToLongString());
+    }
+    private void ShowLabInfoButton_Click(object sender, RoutedEventArgs e)
+    {
+        LogService.Log("Лабораторная работа по Исследованию операций №1\nФомин Н. А.\nВПР22");
+    }
+    private void SolveButton_Click(object sender, RoutedEventArgs e)
+    {
+        // Получим копию нормализованной исходной таблицы
+        var table = InitialValues.Normalized();
+
+        // Найдем опорный план
+        LogService.Log("Найдём опорный план");
+        var path = GetPivotPlan(table);
+        LogService.Log(GetV3ListStack(path, "Найденный опорный план:"));
+
+        // Значение целевой функции
+        var targetFuncVal = GetTargetFuncValue(table, path);
+        LogService.Log($"Стоимость перевозок: {targetFuncVal}");
     }
 }
