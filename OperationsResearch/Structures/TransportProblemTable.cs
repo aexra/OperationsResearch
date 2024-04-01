@@ -24,7 +24,7 @@ public class TransportProblemTable : ICloneable
         var list = new List<int>();
         for (var i = 0; i < Rows.Count - 1; i++)
         {
-            list.Add((int)Rows[i][0]);
+            list.Add((int)Rows[i].Last());
         }
         return list;
     }
@@ -53,8 +53,8 @@ public class TransportProblemTable : ICloneable
         for (var i = 0; i < Rows.Count - 1; i++)
         {
             output += "\n";
-            output += $"A{i + 1}={Rows[i][0]}\t";
-            for  (var j = 1; j < Rows[i].Count; j++) { output += Rows[i][j] + "\t"; }
+            output += $"A{i + 1}={Rows[i].Last()}\t";
+            for  (var j = 0; j < Rows[i].Count - 1; j++) { output += Rows[i][j] + "\t"; }
         }
 
         return output;
@@ -84,14 +84,17 @@ public class TransportProblemTable : ICloneable
                 LogService.Log($"Как видно, суммарная потребность груза в пунктах назначения меньше запасов груза на базах. Следовательно, модель исходной транспортной задачи является открытой. Чтобы получить закрытую модель, введем дополнительную (фиктивную) потребность, равной {totalcap} - {totalreq} = {diff}. Тарифы перевозки единицы груза к этому потребителю полагаем равны нулю.\r\nЗанесем исходные данные в распределительную таблицу.");
                 for (var i = 0; i < Values.Rows.Count - 1; i++)
                 {
-                    Values.Rows[i].Add(0);
+                    Values.Rows[i].Insert(Values.Rows[i].Count - 1, 0);
                 }
                 Values.Rows[^1].Add(diff);
             }
             else
             {
                 LogService.Log($"Как видно, суммарная потребность груза в пунктах назначения превышает запасы груза на базах. Следовательно, модель исходной транспортной задачи является открытой. Чтобы получить закрытую модель, введем дополнительную (фиктивную) базу с запасом груза, равным {totalreq} - {totalcap} = {diff}. Тарифы перевозки единицы груза из базы ко всем потребителям полагаем равны нулю.\r\nЗанесем исходные данные в распределительную таблицу.");
-                Values.Rows.Insert(Values.Rows.Count - 1, new List<object>() { diff, 0, 0 });
+                List<object> newRow = new();
+                foreach (var _ in Rows[^1]) { newRow.Add(0); }
+                newRow.Add(diff);
+                Values.Rows.Insert(Values.Rows.Count - 1, newRow);
             }
             LogService.Log(Values.ToLongString());
         }

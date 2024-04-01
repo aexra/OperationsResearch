@@ -28,14 +28,14 @@ public sealed partial class MainWindow : Window
     private void FillInitialTable()
     {
         // Мой вариант
-        InitialValues.Rows.Add(new List<object>() { 200, 1, 4, 5, 3, 1 });
-        InitialValues.Rows.Add(new List<object>() { 350, 2, 3, 1, 4, 2 });
-        InitialValues.Rows.Add(new List<object>() { 150, 2, 1, 3, 1, 2 });
+        InitialValues.Rows.Add(new List<object>() { 1, 4, 5, 3, 1, 200 });
+        InitialValues.Rows.Add(new List<object>() { 2, 3, 1, 4, 2, 350 });
+        InitialValues.Rows.Add(new List<object>() { 2, 1, 3, 1, 2, 150 });
         InitialValues.Rows.Add(new List<object>() { 100, 100, 80, 90, 70 });
 
         // Пример с capacity < requests
-        //InitialValues.Rows.Add(new List<object>() { 10, 1, 3 });
-        //InitialValues.Rows.Add(new List<object>() { 10, 2, 1 });
+        //InitialValues.Rows.Add(new List<object>() { 1, 3, 10 });
+        //InitialValues.Rows.Add(new List<object>() { 1, 2, 10 });
         //InitialValues.Rows.Add(new List<object>() { 50, 100 });
     }
 
