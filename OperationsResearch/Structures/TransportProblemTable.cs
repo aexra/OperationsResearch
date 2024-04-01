@@ -38,7 +38,12 @@ public class TransportProblemTable : ICloneable
         var tpt = new TransportProblemTable();
         foreach (var row in Rows)
         {
-            tpt.Rows.Add(row);
+            List<object> list = new();
+            foreach (var value in row)
+            {
+                list.Add(value);
+            }
+            tpt.Rows.Add(list);
         }
         return tpt;
     }
