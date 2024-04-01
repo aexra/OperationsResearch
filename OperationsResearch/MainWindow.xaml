@@ -7,17 +7,24 @@
     xmlns:d="http://schemas.microsoft.com/expression/blend/2008"
     xmlns:mc="http://schemas.openxmlformats.org/markup-compatibility/2006"
     xmlns:services="using:OperationsResearch.Services"
+    xmlns:tkcontrols="using:CommunityToolkit.WinUI.UI.Controls"
     mc:Ignorable="d">
 
     <Grid Background="#272727">
         
         <Grid.ColumnDefinitions>
+            <ColumnDefinition Width="600"/>
             <ColumnDefinition Width="*"/>
-            <ColumnDefinition Width="500"/>
         </Grid.ColumnDefinitions>
 
         <Border Grid.Column="0" CornerRadius="10" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="20 20 10 20">
-            
+            <StackPanel Spacing="10" Padding="10">
+                <Button x:Name="ShowLabInfo" Content="Показать инфу о лабе" HorizontalAlignment="Stretch" Click="ShowLabInfo_Click"/>
+                <Button x:Name="ShowInitialTableButton" Content="Показать исходную таблицу" HorizontalAlignment="Stretch" Click="ShowInitialTableButton_Click"/>
+                <Button Content="Aaaa" HorizontalAlignment="Stretch"/>
+                <Button Content="Aaaa" HorizontalAlignment="Stretch"/>
+                <Button Content="Aaaa" HorizontalAlignment="Stretch"/>
+            </StackPanel>
         </Border>
 
         <Border Grid.Column="1" CornerRadius="10" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="10 20 20 20">
