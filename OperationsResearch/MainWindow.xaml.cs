@@ -17,8 +17,11 @@ public sealed partial class MainWindow : Window
         LogService.Log("Application launched");
 
         FillInitialTable();
+
+        ShowLabInfoButton_Click(null, null);
     }
 
+    // WEIRD STUFF FOR LAB
     private void FillInitialTable()
     {
         Values.Rows.Add(new List<object>(){ "1", "4", "5", "3", "1" });
@@ -28,13 +31,13 @@ public sealed partial class MainWindow : Window
         Values.Names = new List<string>() { "A1=200", "A2=350", "A3=150" };
     }
 
+    // BUTTON CLICK EVENTS
     private void ShowInitialTableButton_Click(object sender, RoutedEventArgs e)
     {
         LogService.Log(Values.ToLongString());
     }
-
-    private void ShowLabInfo_Click(object sender, RoutedEventArgs e)
+    private void ShowLabInfoButton_Click(object sender, RoutedEventArgs e)
     {
-
+        LogService.Log("Лабораторная работа по Исследованию операций №1\nФомин Н. А.\nВПР22");
     }
 }

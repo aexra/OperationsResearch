@@ -19,7 +19,7 @@
 
         <Border Grid.Column="0" CornerRadius="10" Background="{ThemeResource ApplicationPageBackgroundThemeBrush}" Margin="20 20 10 20">
             <StackPanel Spacing="10" Padding="10">
-                <Button x:Name="ShowLabInfo" Content="Показать инфу о лабе" HorizontalAlignment="Stretch" Click="ShowLabInfo_Click"/>
+                <Button x:Name="ShowLabInfoButton" Content="Показать инфу о лабе" HorizontalAlignment="Stretch" Click="ShowLabInfoButton_Click"/>
                 <Button x:Name="ShowInitialTableButton" Content="Показать исходную таблицу" HorizontalAlignment="Stretch" Click="ShowInitialTableButton_Click"/>
                 <Button Content="Aaaa" HorizontalAlignment="Stretch"/>
                 <Button Content="Aaaa" HorizontalAlignment="Stretch"/>
