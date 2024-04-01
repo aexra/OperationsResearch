@@ -5,14 +5,13 @@ using System;
 using System.Collections.Generic;
 using System.Data;
 using System.Linq;
+using System.Runtime.CompilerServices;
 
 namespace OperationsResearch;
 public sealed partial class MainWindow : Window
 {
     TransportProblemTable InitialValues = new();
     TransportProblemTable Values = new();
-    List<int> Capacity => GetCapacity();
-    List<int> Requests => GetRequests();
 
     public MainWindow()
     {
@@ -39,19 +38,6 @@ public sealed partial class MainWindow : Window
         //InitialValues.Rows.Add(new List<object>() { 10, 2, 1 });
         //InitialValues.Rows.Add(new List<object>() { 50, 100 });
     }
-    private List<int> GetCapacity()
-    {
-        var list = new List<int>();
-        for (var i = 0; i < Values.Rows.Count - 1; i++)
-        {
-            list.Add((int)Values.Rows[i][0]);
-        }
-        return list;
-    }
-    private List<int> GetRequests()
-    {
-        return Values.Rows[^1].Cast<int>().ToList();
-    }
 
     // BUTTON CLICK EVENTS
     private void ShowInitialTableButton_Click(object sender, RoutedEventArgs e)
@@ -64,39 +50,11 @@ public sealed partial class MainWindow : Window
     }
     private void SolveButton_Click(object sender, RoutedEventArgs e)
     {
-        //  опируем исходную таблицу
-        Values = (TransportProblemTable)InitialValues.Clone();
+        // ѕолучим копию нормализованной исходной таблицы
+        Values = InitialValues.Normalized();
 
-        // ѕроверим необходимое и достаточное условие разрешимости задачи
-        LogService.Log("ѕроверим необходимое и достаточное условие разрешимости задачи:");
+        
 
-        var totalcap = Capacity.Sum();
-        var totalreq = Requests.Sum();
-        LogService.Log($"«апасы: {totalcap}\nѕотребности: {totalreq}");
 
-        // ќценим знаени€
-        if (totalcap == totalreq)
-        {
-            LogService.Log("«начени€ равны, следовательно необходимое и достаточное условие разрешимости задачи выполн€етс€");
-        }
-        else
-        {
-            var diff = Math.Abs(totalcap - totalreq);
-            if (totalcap > totalreq)
-            {
-                LogService.Log($" ак видно, суммарна€ потребность груза в пунктах назначени€ меньше запасов груза на базах. —ледовательно, модель исходной транспортной задачи €вл€етс€ открытой. „тобы получить закрытую модель, введем дополнительную (фиктивную) потребность, равной {totalcap} - {totalreq} = {diff}. “арифы перевозки единицы груза к этому потребителю полагаем равны нулю.\r\n«анесем исходные данные в распределительную таблицу.");
-                for (var i = 0; i < Values.Rows.Count - 1; i++)
-                {
-                    Values.Rows[i].Add(0);
-                }
-                Values.Rows[^1].Add(diff);
-            }
-            else
-            {
-                LogService.Log($" ак видно, суммарна€ потребность груза в пунктах назначени€ превышает запасы груза на базах. —ледовательно, модель исходной транспортной задачи €вл€етс€ открытой. „тобы получить закрытую модель, введем дополнительную (фиктивную) базу с запасом груза, равным {totalreq} - {totalcap} = {diff}. “арифы перевозки единицы груза из базы ко всем потребител€м полагаем равны нулю.\r\n«анесем исходные данные в распределительную таблицу.");
-                Values.Rows.Insert(Values.Rows.Count - 1, new List<object>() { diff, 0, 0 });
-            }
-            LogService.Log(Values.ToLongString());
-        }
     }
 }

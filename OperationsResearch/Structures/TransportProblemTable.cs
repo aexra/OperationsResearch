@@ -1,18 +1,36 @@
-﻿using System;
+﻿using OperationsResearch.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Foundation.Collections;
 
 namespace OperationsResearch.Structures;
 
-internal class TransportProblemTable : ICloneable
+public class TransportProblemTable : ICloneable
 {
     public List<List<object>> Rows;
-    
+    public List<int> Capacity => GetCapacity();
+    public List<int> Requests => GetRequests();
+
     public TransportProblemTable()
     {
         Rows = new();
+    }
+
+    private List<int> GetCapacity()
+    {
+        var list = new List<int>();
+        for (var i = 0; i < Rows.Count - 1; i++)
+        {
+            list.Add((int)Rows[i][0]);
+        }
+        return list;
+    }
+    private List<int> GetRequests()
+    {
+        return Rows[^1].Cast<int>().ToList();
     }
 
     public object Clone()
@@ -40,5 +58,44 @@ internal class TransportProblemTable : ICloneable
         }
 
         return output;
+    }
+
+    public TransportProblemTable Normalized()
+    {
+        var Values = (TransportProblemTable)Clone();
+
+        // Проверим необходимое и достаточное условие разрешимости задачи
+        LogService.Log("Проверим необходимое и достаточное условие разрешимости задачи:");
+
+        var totalcap = Values.Capacity.Sum();
+        var totalreq = Values.Requests.Sum();
+        LogService.Log($"Запасы: {totalcap}\nПотребности: {totalreq}");
+
+        // Оценим знаения
+        if (totalcap == totalreq)
+        {
+            LogService.Log("Значения равны, следовательно необходимое и достаточное условие разрешимости задачи выполняется");
+        }
+        else
+        {
+            var diff = Math.Abs(totalcap - totalreq);
+            if (totalcap > totalreq)
+            {
+                LogService.Log($"Как видно, суммарная потребность груза в пунктах назначения меньше запасов груза на базах. Следовательно, модель исходной транспортной задачи является открытой. Чтобы получить закрытую модель, введем дополнительную (фиктивную) потребность, равной {totalcap} - {totalreq} = {diff}. Тарифы перевозки единицы груза к этому потребителю полагаем равны нулю.\r\nЗанесем исходные данные в распределительную таблицу.");
+                for (var i = 0; i < Values.Rows.Count - 1; i++)
+                {
+                    Values.Rows[i].Add(0);
+                }
+                Values.Rows[^1].Add(diff);
+            }
+            else
+            {
+                LogService.Log($"Как видно, суммарная потребность груза в пунктах назначения превышает запасы груза на базах. Следовательно, модель исходной транспортной задачи является открытой. Чтобы получить закрытую модель, введем дополнительную (фиктивную) базу с запасом груза, равным {totalreq} - {totalcap} = {diff}. Тарифы перевозки единицы груза из базы ко всем потребителям полагаем равны нулю.\r\nЗанесем исходные данные в распределительную таблицу.");
+                Values.Rows.Insert(Values.Rows.Count - 1, new List<object>() { diff, 0, 0 });
+            }
+            LogService.Log(Values.ToLongString());
+        }
+
+        return Values;
     }
 }
