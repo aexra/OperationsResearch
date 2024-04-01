@@ -1,0 +1,10 @@
+{
+  "profiles": {
+    "OperationsResearch (Package)": {
+      "commandName": "MsixPackage"
+    },
+    "OperationsResearch (Unpackaged)": {
+      "commandName": "Project"
+    }
+  }
+}
