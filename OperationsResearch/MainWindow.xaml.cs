@@ -21,7 +21,7 @@ public sealed partial class MainWindow : Window
 
         LogService.Log("Application launched");
 
-        FillInitialMaksTable();
+        FillInitialMyTable();
 
         ShowLabInfoButton_Click(null, null);
     }
