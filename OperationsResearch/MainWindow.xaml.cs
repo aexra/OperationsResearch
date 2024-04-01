@@ -21,35 +21,52 @@ public sealed partial class MainWindow : Window
 
         LogService.Log("Application launched");
 
-        FillInitialTable();
+        FillInitialMaksTable();
 
         ShowLabInfoButton_Click(null, null);
     }
 
     // WEIRD STUFF FOR LAB
-    private void FillInitialTable()
+    private void FillInitialMyTable()
     {
         // Мой вариант
         InitialValues.Rows.Add(new List<object>() { 1, 4, 5, 3, 1, 200 });
         InitialValues.Rows.Add(new List<object>() { 2, 3, 1, 4, 2, 350 });
         InitialValues.Rows.Add(new List<object>() { 2, 1, 3, 1, 2, 150 });
         InitialValues.Rows.Add(new List<object>() { 100, 100, 80, 90, 70 });
-
-        // Пример с capacity < requests
-        //InitialValues.Rows.Add(new List<object>() { 1, 3, 10 });
-        //InitialValues.Rows.Add(new List<object>() { 1, 2, 10 });
-        //InitialValues.Rows.Add(new List<object>() { 50, 100 });
     }
-    private List<Vector3> GetPivotPlan(TransportProblemTable Values)
+    private void FillInitialTable2()
     {
-        List<Vector3> path = new();
+        // Пример с capacity < requests
+        InitialValues.Rows.Add(new List<object>() { 1, 1, 1, 14 });
+        InitialValues.Rows.Add(new List<object>() { 1, 1, 1, 20 });
+        InitialValues.Rows.Add(new List<object>() { 1, 1, 1, 33 });
+        InitialValues.Rows.Add(new List<object>() { 50, 100, 200 });
+    }
+    private void FillInitialMaksTable()
+    {
+        // Вариант Фоминцева М.
+        InitialValues.Rows.Add(new List<object>() { 1, 2, 4, 1, 5, 200 });
+        InitialValues.Rows.Add(new List<object>() { 1, 2, 1, 3, 1, 120 });
+        InitialValues.Rows.Add(new List<object>() { 2, 1, 3, 3, 1, 150 });
+        InitialValues.Rows.Add(new List<object>() { 100, 90, 200, 30, 80 });
+    }
+    private List<Vector4> GetPivotPlan(TransportProblemTable Values)
+    {
+        List<Vector4> path = new();
 
         var x = 0;
         var y = 0;
 
         while (true)
         {
-            LogService.Log($"Рассматриваемая точка: ({x}, {y})");
+            LogService.Log($"Рассматриваемая точка: ({y}, {x})");
+            if (Values.Rows[y][x] is char)
+            {
+                y++;
+                if (y >= Values.Rows.Count - 1) break;
+                continue;
+            }
 
             var min = Math.Min(Values.Capacity[y], Values.Requests[x]);
 
@@ -58,6 +75,7 @@ public sealed partial class MainWindow : Window
             Values.Rows[y][^1] = Values.Capacity[y] - min;
             Values.Rows[^1][x] = Values.Requests[x] - min;
 
+            // х всё что справа
             if ((int)Values.Rows[y][^1] == 0)
             {
                 for (var i = x + 1; i < Values.Requests.Count; i++)
@@ -65,6 +83,7 @@ public sealed partial class MainWindow : Window
                     Values.Rows[y][i] = 'x';
                 }
             }
+            // х всё что снизу
             else if ((int)Values.Rows[^1][x] == 0)
             {
                 for (var i = y + 1; i < Values.Capacity.Count; i++)
@@ -75,31 +94,32 @@ public sealed partial class MainWindow : Window
 
             LogService.Log("Результат:\n" + Values.ToLongString());
 
-            path.Add(new(x, y, min));
+            path.Add(new(x, y, min, (int)Values.Rows[y][x]));
 
-            x++;
-            if (x >= Values.Rows[^1].Count) { x--; y++; }
-            if (y >= Values.Rows.Count - 1) break;
+            
+            if ((int)Values.Rows[y][^1] == 0) { y++; }
+            else if ((int)Values.Rows[^1][x] == 0) { x++; }
 
-            var toForceBreak = false;
-            while (Values.Capacity[y] <= 0) { y++; LogService.Log($"{y}"); if (y >= Values.Rows.Count - 1) { toForceBreak = true; break; } }
-            if (toForceBreak) break;
+            if (x >= Values.Rows[^1].Count) { x = 0; y++; }
+            if (y >= Values.Rows.Count - 1) { y--; }
+
+            if (x == Values.Rows[^1].Count - 1 && y == Values.Rows.Count - 2) break;
         }
 
         return path;
     }
-    private string GetV3ListStack(List<Vector3> list, string title)
+    private string GetV4ListStack(List<Vector4> list, string title)
     {
         var s = title;
-        list.ForEach(x => s += $"\n({x.Y + 1}, {x.X + 1}, {x.Z})");
+        list.ForEach(x => s += $"\n({x.Y + 1}, {x.X + 1}, {x.Z} * {x.W})");
         return s;
     }
-    private int GetTargetFuncValue(TransportProblemTable table, List<Vector3> path)
+    private int GetTargetFuncValue(TransportProblemTable table, List<Vector4> path)
     {
         var sum = 0;
         foreach (var vec in path)
         {
-            sum += (int)vec.Z * (int)table.Rows[(int)vec.Y][(int)vec.X];
+            sum += (int)vec.Z * (int)vec.W;
         }
         return sum;
     }
@@ -121,7 +141,7 @@ public sealed partial class MainWindow : Window
         // Найдем опорный план
         LogService.Log("Найдём опорный план");
         var path = GetPivotPlan(table);
-        LogService.Log(GetV3ListStack(path, "Найденный опорный план:"));
+        LogService.Log(GetV4ListStack(path, "Найденный опорный план:"));
 
         // Значение целевой функции
         var targetFuncVal = GetTargetFuncValue(table, path);
