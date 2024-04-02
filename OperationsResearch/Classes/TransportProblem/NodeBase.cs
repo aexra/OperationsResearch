@@ -17,6 +17,10 @@ public abstract class NodeBase
 
     public Link Connect(NodeBase node, int cost)
     {
+        if (Links.Exists(x => x.Right == node))
+        {
+            return Links.Find(x => x.Right == node);
+        }
         var nn = new Link(this, node, cost);
         Links.Add(nn);
         return nn;
