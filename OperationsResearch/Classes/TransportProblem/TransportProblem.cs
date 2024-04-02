@@ -1,5 +1,7 @@
-﻿using System;
+﻿using OperationsResearch.Enums;
+using System;
 using System.Collections.Generic;
+using System.Linq;
 using System.Numerics;
 using Windows.Storage.Streams;
 
@@ -40,6 +42,27 @@ public class TransportProblem : ICloneable
     }
 
     // PROBLEM METHODS
+    public object Solve()
+    {
+        return new object();
+    }
+    public TransportProblemNormalizationResult Normalize()
+    {
+        var capacity = Providers.Select(x => x.Cost).Sum();
+        var requests = Consumers.Select(x => x.Cost).Sum();
+
+        if (capacity == requests) return TransportProblemNormalizationResult.Match;
+        else if (capacity > requests)
+        {
+            CreateConsumer(capacity - requests);
+            return TransportProblemNormalizationResult.Excess;
+        }
+        else
+        {
+            CreateProvider(requests - capacity);
+            return TransportProblemNormalizationResult.Deficiency;
+        }
+    }
     public Vector4 GetInitialPlanMask()
     {
         var vec = new Vector4();
@@ -54,6 +77,44 @@ public class TransportProblem : ICloneable
     {
         Providers[p].Connect(Consumers[c], cost);
         Consumers[c].Connect(Consumers[p], cost);
+    }
+    public Consumer CreateProvider(int cost, int[] travelCosts = null)
+    {
+        Providers.Add(new($"A{Providers.Count + 1}", cost));
+        if (travelCosts == null)
+        {
+            for (var i_c = 0; i_c < Consumers.Count; i_c++)
+            {
+                CreateMutualLink(i_c, Providers.Count - 1, 0);
+            }
+        }
+        else
+        {
+            for (var i_c = 0; i_c < Consumers.Count; i_c++)
+            {
+                CreateMutualLink(i_c, Providers.Count - 1, travelCosts[i_c]);
+            }
+        }
+        return Consumers.Last();
+    }
+    public Consumer CreateConsumer(int cost, int[] travelCosts = null)
+    {
+        Consumers.Add(new($"B{Consumers.Count + 1}", cost));
+        if (travelCosts == null)
+        {
+            for (var i_p = 0; i_p < Providers.Count; i_p++)
+            {
+                CreateMutualLink(i_p, Consumers.Count - 1, 0);
+            }
+        }
+        else
+        {
+            for (var i_p = 0; i_p < Providers.Count; i_p++)
+            {
+                CreateMutualLink(i_p, Consumers.Count - 1, travelCosts[i_p]);
+            }
+        }
+        return Consumers.Last();
     }
 
     // HELPER METHODS
@@ -76,9 +137,9 @@ public class TransportProblem : ICloneable
 
         return s;
     }
-    public int GetCost(Provider p, Consumer c)
+    public int GetCost(NodeBase n1, NodeBase n2)
     {
-        return p.Links.Find(x => x.Right == c).Cost;
+        return n1.Links.Find(x => x.Right == n2).Cost;
     }
 
     // INTERFACE IMPLEMENTATION
