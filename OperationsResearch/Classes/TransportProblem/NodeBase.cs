@@ -1,7 +1,8 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
 
 namespace OperationsResearch.Classes.TransportProblem;
-public abstract class NodeBase
+public abstract class NodeBase : IEquatable<NodeBase>
 {
     public List<Link> Links;
     public string Name;
@@ -24,5 +25,11 @@ public abstract class NodeBase
         var nn = new Link(this, node, cost);
         Links.Add(nn);
         return nn;
+    }
+
+    // INTERFACE IMPLEMENTATION
+    public bool Equals(NodeBase other)
+    {
+        return Name == other.Name;
     }
 }

@@ -1,8 +1,10 @@
-﻿using System.Collections.Generic;
+﻿using System;
+using System.Collections.Generic;
+using System.Numerics;
 using Windows.Storage.Streams;
 
 namespace OperationsResearch.Classes.TransportProblem;
-public class TransportProblem
+public class TransportProblem : ICloneable
 {
     public List<Provider> Providers;
     public List<Consumer> Consumers;
@@ -37,12 +39,24 @@ public class TransportProblem
         }
     }
 
+    // PROBLEM METHODS
+    public Vector4 GetInitialPlanMask()
+    {
+        var vec = new Vector4();
+
+
+
+        return vec;
+    }
+
+    // NODES MANIPULATION METHODS
     public void CreateMutualLink(int p, int c, int cost)
     {
         Providers[p].Connect(Consumers[c], cost);
         Consumers[c].Connect(Consumers[p], cost);
     }
 
+    // HELPER METHODS
     public string GetTableString()
     {
         var s = "";
@@ -61,5 +75,34 @@ public class TransportProblem
         }
 
         return s;
+    }
+
+    // INTERFACE IMPLEMENTATION
+    public object Clone()
+    {
+        int[] ps = new int[Providers.Count];
+        int[] cs = new int[Consumers.Count];
+        int[][] costs = new int[Providers.Count][];
+
+        for (var i_p = 0; i_p < Providers.Count; i_p++)
+        {
+            ps[i_p] = Providers[i_p].Cost;
+        }
+        for (var i_c = 0; i_c < Consumers.Count; i_c++) 
+        {
+            cs[i_c] = Consumers[i_c].Cost;
+        }
+
+        for (var i_p = 0; i_p < Providers.Count; i_p++)
+        {
+            var costs_p = new int[Consumers.Count];
+            for (var i_c = 0; i_c < Consumers.Count; i_c++)
+            {
+                costs_p[i_c] = Providers[i_p].Links.Find(x => x.Right == Consumers[i_c]).Cost;
+            }
+            costs[i_p] = costs_p;
+        }
+
+        return new TransportProblem(ps, cs, costs);
     }
 }

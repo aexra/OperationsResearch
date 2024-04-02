@@ -1,5 +1,7 @@
-﻿namespace OperationsResearch.Classes.TransportProblem;
-public class Link
+﻿using System;
+
+namespace OperationsResearch.Classes.TransportProblem;
+public class Link : IEquatable<Link>
 {
     public NodeBase Left;
     public NodeBase Right;
@@ -10,5 +12,11 @@ public class Link
         Left = left;
         Right = right;
         Cost = cost;
+    }
+
+    // INTERFACE IMPLEMENTATION
+    public bool Equals(Link other)
+    {
+        return Left == other.Left && Right == other.Right;
     }
 }
