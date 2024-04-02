@@ -76,6 +76,10 @@ public class TransportProblem : ICloneable
 
         return s;
     }
+    public int GetCost(Provider p, Consumer c)
+    {
+        return p.Links.Find(x => x.Right == c).Cost;
+    }
 
     // INTERFACE IMPLEMENTATION
     public object Clone()
