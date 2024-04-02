@@ -1,4 +1,5 @@
 ﻿using System.Collections.Generic;
+using Windows.Storage.Streams;
 
 namespace OperationsResearch.Classes.TransportProblem;
 public class TransportProblem
@@ -40,5 +41,25 @@ public class TransportProblem
     {
         Providers[p].Connect(Consumers[c], cost);
         Consumers[c].Connect(Consumers[p], cost);
+    }
+
+    public string GetTableString()
+    {
+        var s = "";
+
+        foreach (var consumer in Consumers)
+        {
+            s += $"\t{consumer.Name}={consumer.Cost}";
+        }
+        foreach (var provider in Providers)
+        {
+            s += $"\n{provider.Name}={provider.Cost}";
+            foreach (var consumer in Consumers)
+            {
+                s += $"\t{provider.Links.Find(x => x.Right == consumer).Cost}";
+            }
+        }
+
+        return s;
     }
 }

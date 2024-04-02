@@ -24,13 +24,15 @@ public sealed partial class MainWindow : Window
 
         LogService.Log("Application launched");
 
-        FillInitialMyTable();
+        //FillInitialMyTable();
 
-        ShowLabInfoButton_Click(null, null);
+        //ShowLabInfoButton_Click(null, null);
 
         /// HERE GOES PONOS
 
+        FillVariantMine();
 
+        LogService.Log(Problem.GetTableString());
     }
 
     /// SOME VARIANTS OF TRANSPORT PROBLEM
