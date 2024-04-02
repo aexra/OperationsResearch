@@ -31,7 +31,9 @@ public sealed partial class MainWindow : Window
         /// HERE GOES PONOS
 
         FillVariantMine();
+        LogService.Log(Problem.GetTableString());
 
+        Problem.Normalize();
         LogService.Log(Problem.GetTableString());
     }
 
