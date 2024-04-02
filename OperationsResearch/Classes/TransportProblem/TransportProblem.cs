@@ -65,65 +65,76 @@ public class TransportProblem : ICloneable
             return TransportProblemNormalizationResult.Deficiency;
         }
     }
-    public Vector4 GetInitialPlanMask()
+    public List<Vector4> GetInitialPlanMask(out object[][] mask)
     {
-        var path = new Vector4();
+        var path = new List<Vector4>();
 
         var x = 0;
         var y = 0;
 
-        object[][] planMask = new object[Providers.Count][];
+        // То что я буду редактировать
+        mask = new object[Providers.Count][];
+        var capacity = Providers.Select(x => x.Cost).ToArray();
+        var requests = Consumers.Select(x => x.Cost).ToArray();
+
+        // Заполняю plan исходными значениями
         for (var i_p = 0; i_p < Providers.Count; i_p++)
         {
-            planMask[i_p] = Providers[i_p].Links.Select(x => x.Cost).Cast<object>().ToArray();
+            mask[i_p] = Providers[i_p].Links.Select(x => x.Cost).Cast<object>().ToArray();
         }
 
-        //while (true)
-        //{
-        //    LogService.Log($"Рассматриваемая точка: ({y}, {x})");
-        //    if (Values.Rows[y][x] is char)
-        //    {
-        //        y++;
-        //        if (y >= Values.Rows.Count - 1) break;
-        //        continue;
-        //    }
-        //    var min = Math.Min(Values.Capacity[y], Values.Requests[x]);
-        //    LogService.Log($"Минимальное: {min}");
+        while (true)
+        {
+            // Если там Х, то смещаемся вниз
+            if (mask[y][x] is char)
+            {
+                y++;
+                if (y >= mask.Length - 1) break;
+                continue;
+            }
 
-        //    Values.Rows[y][^1] = Values.Capacity[y] - min;
-        //    Values.Rows[^1][x] = Values.Requests[x] - min;
+            // Минимальное среди потребителя и провайдера
+            var min = Math.Min(capacity[y], requests[x]);
 
-        //    // х всё что справа
-        //    if ((int)Values.Rows[y][^1] == 0)
-        //    {
-        //        for (var i = x + 1; i < Values.Requests.Count; i++)
-        //        {
-        //            Values.Rows[y][i] = 'x';
-        //        }
-        //    }
-        //    // х всё что снизу
-        //    else if ((int)Values.Rows[^1][x] == 0)
-        //    {
-        //        for (var i = y + 1; i < Values.Capacity.Count; i++)
-        //        {
-        //            Values.Rows[i][x] = 'x';
-        //        }
-        //    }
+            // Изменяем величины потребителей и провайдеров
+            capacity[y] -= min;
+            requests[x] -= min;
 
-        //    LogService.Log("Результат:\n" + Values.ToLongString());
+            // х всё что справа
+            if (capacity[y] == 0)
+            {
+                for (var i = x + 1; i < requests.Length; i++)
+                {
+                    mask[y][i] = 'x';
+                }
+            }
+            // х всё что снизу
+            else if (requests[x] == 0)
+            {
+                for (var i = y + 1; i < capacity.Length; i++)
+                {
+                    mask[i][x] = 'x';
+                }
+            }
 
-        //    path.Add(new(x, y, min, (int)Values.Rows[y][x]));
+            // Добавляем текущую точку в список вершин пути
+            path.Add(new(x, y, min, (int)mask[y][x]));
 
+            // Перемещаем курсор
+            if (capacity[y] == 0) { y++; }
+            else if (requests[x] == 0) { x++; }
 
-        //    if ((int)Values.Rows[y][^1] == 0) { y++; }
-        //    else if ((int)Values.Rows[^1][x] == 0) { x++; }
-
-        //    if (x >= Values.Rows[^1].Count) { x = 0; y++; }
-        //    if (y >= Values.Rows.Count - 1) { y--; }
-        //    if (x == Values.Rows[^1].Count - 1 && y == Values.Rows.Count - 2) break;
-        //}
+            // Какие-то странные условия выхода мне лень проверять что из этого не нужно
+            if (x >= requests.Length) { x = 0; y++; }
+            //if (y >= capacity.Length) { y--; }
+            if (x == requests.Length - 1 && y == capacity.Length - 1) break;
+        }
 
         return path;
+    }
+    public int GetInitialTargetValue()
+    {
+        return GetInitialPlanMask(out _).Select(x => (int)x.Z * (int)x.W).Sum();
     }
 
     // NODES MANIPULATION METHODS
