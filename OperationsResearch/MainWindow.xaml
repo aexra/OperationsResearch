@@ -21,7 +21,7 @@
             <StackPanel Spacing="10" Padding="10">
                 <Button x:Name="ShowLabInfoButton" Content="Показать инфу о лабе" HorizontalAlignment="Stretch" Click="ShowLabInfoButton_Click"/>
                 <Button x:Name="SolveMyButton" Content="Решить мой вариант" HorizontalAlignment="Stretch" Click="SolveMyButton_Click"/>
-                <Button Content="Aaaa" HorizontalAlignment="Stretch"/>
+                <Button x:Name="SolveMaksButton" Content="Решить вариант 8" HorizontalAlignment="Stretch" Click="SolveMaksButton_Click"/>
                 <Button Content="Aaaa" HorizontalAlignment="Stretch"/>
             </StackPanel>
         </Border>

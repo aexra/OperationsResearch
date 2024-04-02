@@ -141,7 +141,7 @@ public class TransportProblem : ICloneable
     public void CreateMutualLink(int p, int c, int cost)
     {
         Providers[p].Connect(Consumers[c], cost);
-        Consumers[c].Connect(Consumers[p], cost);
+        Consumers[c].Connect(Providers[p], cost);
     }
     public Consumer CreateProvider(int cost, int[] travelCosts = null)
     {
@@ -150,14 +150,14 @@ public class TransportProblem : ICloneable
         {
             for (var i_c = 0; i_c < Consumers.Count; i_c++)
             {
-                CreateMutualLink(i_c, Providers.Count - 1, 0);
+                CreateMutualLink(Providers.Count - 1, i_c, 0);
             }
         }
         else
         {
             for (var i_c = 0; i_c < Consumers.Count; i_c++)
             {
-                CreateMutualLink(i_c, Providers.Count - 1, travelCosts[i_c]);
+                CreateMutualLink(Providers.Count - 1, i_c, travelCosts[i_c]);
             }
         }
         return Consumers.Last();

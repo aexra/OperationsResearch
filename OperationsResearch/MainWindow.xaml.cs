@@ -36,15 +36,24 @@ public sealed partial class MainWindow : Window
             }
         );
     }
-
-    // BUTTON CLICK EVENTS
-    private void ShowLabInfoButton_Click(object sender, RoutedEventArgs e)
+    // MASKIM FOMINTSEV'S PROBLEM
+    private TransportProblem GetVariantMaks()
     {
-        LogService.Log("Лабораторная работа по Исследованию операций №1\nФомин Н. А.\nВПР22");
+        return new(
+            new int[] { 200, 120, 150 },
+            new int[] { 100, 90, 200, 30, 80 },
+            new int[][] {
+                new int[] { 1, 2, 4, 1, 5 },
+                new int[] { 1, 2, 1, 3, 1 },
+                new int[] { 2, 1, 3, 3, 1 }
+            }
+        );
     }
-    private void SolveMyButton_Click(object sender, RoutedEventArgs e)
+
+    /// SOME WEIRD STUFF GOES HERE
+    // BASE METHOD TO OUTPUT SOLUTION
+    private void Solve(TransportProblem problem)
     {
-        var problem = GetVariantMine();
         LogService.Log(problem.GetTableString());
 
         problem.Normalize();
@@ -54,5 +63,19 @@ public sealed partial class MainWindow : Window
         path.ForEach(x => LogService.Log(x.ToLongString()));
 
         LogService.Log($"Начальное целевое значение: {problem.GetInitialTargetValue()}");
+    }
+
+    // BUTTON CLICK EVENTS
+    private void ShowLabInfoButton_Click(object sender, RoutedEventArgs e)
+    {
+        LogService.Log("Лабораторная работа по Исследованию операций №1\nФомин Н. А.\nВПР22");
+    }
+    private void SolveMyButton_Click(object sender, RoutedEventArgs e)
+    {
+        Solve(GetVariantMine());
+    }
+    private void SolveMaksButton_Click(object sender, RoutedEventArgs e)
+    {
+        Solve(GetVariantMaks());
     }
 }
