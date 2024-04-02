@@ -24,6 +24,10 @@ public sealed partial class MainWindow : Window
         FillInitialMyTable();
 
         ShowLabInfoButton_Click(null, null);
+
+        /// HERE GOES PONOS
+
+
     }
 
     // WEIRD STUFF FOR LAB
