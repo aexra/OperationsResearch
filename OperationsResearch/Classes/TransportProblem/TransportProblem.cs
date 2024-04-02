@@ -122,7 +122,7 @@ public class TransportProblem : ICloneable
 
             // Перемещаем курсор
             if (capacity[y] == 0) { y++; }
-            else if (requests[x] == 0) { x++; }
+            if (requests[x] == 0) { x++; }
 
             // Какие-то странные условия выхода мне лень проверять что из этого не нужно
             if (x >= requests.Length) { x = 0; y++; }
