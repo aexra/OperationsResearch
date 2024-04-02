@@ -1,8 +1,10 @@
 ﻿using OperationsResearch.Enums;
+using OperationsResearch.Services;
 using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Windows.Foundation.Collections;
 using Windows.Storage.Streams;
 
 namespace OperationsResearch.Classes.TransportProblem;
@@ -65,11 +67,63 @@ public class TransportProblem : ICloneable
     }
     public Vector4 GetInitialPlanMask()
     {
-        var vec = new Vector4();
+        var path = new Vector4();
+
+        var x = 0;
+        var y = 0;
+
+        object[][] planMask = new object[Providers.Count][];
+        for (var i_p = 0; i_p < Providers.Count; i_p++)
+        {
+            planMask[i_p] = Providers[i_p].Links.Select(x => x.Cost).Cast<object>().ToArray();
+        }
+
+        //while (true)
+        //{
+        //    LogService.Log($"Рассматриваемая точка: ({y}, {x})");
+        //    if (Values.Rows[y][x] is char)
+        //    {
+        //        y++;
+        //        if (y >= Values.Rows.Count - 1) break;
+        //        continue;
+        //    }
+        //    var min = Math.Min(Values.Capacity[y], Values.Requests[x]);
+        //    LogService.Log($"Минимальное: {min}");
+
+        //    Values.Rows[y][^1] = Values.Capacity[y] - min;
+        //    Values.Rows[^1][x] = Values.Requests[x] - min;
+
+        //    // х всё что справа
+        //    if ((int)Values.Rows[y][^1] == 0)
+        //    {
+        //        for (var i = x + 1; i < Values.Requests.Count; i++)
+        //        {
+        //            Values.Rows[y][i] = 'x';
+        //        }
+        //    }
+        //    // х всё что снизу
+        //    else if ((int)Values.Rows[^1][x] == 0)
+        //    {
+        //        for (var i = y + 1; i < Values.Capacity.Count; i++)
+        //        {
+        //            Values.Rows[i][x] = 'x';
+        //        }
+        //    }
+
+        //    LogService.Log("Результат:\n" + Values.ToLongString());
+
+        //    path.Add(new(x, y, min, (int)Values.Rows[y][x]));
 
 
+        //    if ((int)Values.Rows[y][^1] == 0) { y++; }
+        //    else if ((int)Values.Rows[^1][x] == 0) { x++; }
 
-        return vec;
+        //    if (x >= Values.Rows[^1].Count) { x = 0; y++; }
+        //    if (y >= Values.Rows.Count - 1) { y--; }
+        //    if (x == Values.Rows[^1].Count - 1 && y == Values.Rows.Count - 2) break;
+        //}
+
+        return path;
     }
 
     // NODES MANIPULATION METHODS

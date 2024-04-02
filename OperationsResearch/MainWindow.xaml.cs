@@ -35,6 +35,8 @@ public sealed partial class MainWindow : Window
 
         Problem.Normalize();
         LogService.Log(Problem.GetTableString());
+
+        Problem.GetInitialPlanMask();
     }
 
     /// SOME VARIANTS OF TRANSPORT PROBLEM
