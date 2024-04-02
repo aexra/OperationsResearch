@@ -1,6 +1,7 @@
 using ABI.System.Collections.Generic;
 using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
+using OperationsResearch.Classes.TransportProblem;
 using OperationsResearch.Services;
 using OperationsResearch.Structures;
 using System;
@@ -15,6 +16,8 @@ public sealed partial class MainWindow : Window
 {
     TransportProblemTable InitialValues = new();
 
+    TransportProblem Problem;
+
     public MainWindow()
     {
         this.InitializeComponent();
@@ -28,6 +31,21 @@ public sealed partial class MainWindow : Window
         /// HERE GOES PONOS
 
 
+    }
+
+    /// SOME VARIANTS OF TRANSPORT PROBLEM
+    // MY PROBLEM
+    private void FillVariantMine()
+    {
+        Problem = new(
+            new int[] { 200, 350, 150 }, 
+            new int[] { 100, 100, 80, 90, 70 }, 
+            new int[][] { 
+                new int[] { 1, 4, 5, 3, 1 }, 
+                new int[] { 2, 3, 1, 4, 2 }, 
+                new int[] { 2, 1, 3, 1, 2 } 
+            }
+        );
     }
 
     // WEIRD STUFF FOR LAB
