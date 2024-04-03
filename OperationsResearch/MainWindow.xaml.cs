@@ -88,9 +88,8 @@ public sealed partial class MainWindow : Window
         var plan = problem.GetInitialPlan();
 
         LogService.Log(plan.Mask.ToLongString());
-        LogService.Log($"Начальное целевое значение: {problem.GetInitialTargetValue()}");
-
         LogService.Log($"Путь алгоритма:\n{string.Join("\n", plan.Path.Select(x => $"(i,j)=({x.Y}, {x.X}), min={x.Z}, Cij={x.W}"))}");
+        LogService.Log($"Начальное целевое значение: {problem.GetInitialTargetValue()}");
 
         plan.GetUVPotentials(out var us, out var vs);
         LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");

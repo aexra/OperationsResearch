@@ -118,12 +118,19 @@ public class Plan
             {
                 if (deltas[i][j] is int && (int)deltas[i][j] < minDelta.Z)
                 {
-                    minDelta = new(i, j, (int)deltas[i][j]);
+                    minDelta = new(j, i, (int)deltas[i][j]);
                 }
             }
         }
-    
-        // Начинаем цикл из нее
 
+        // Начинаем цикл из нее
+        List<Vector3> negative = new();
+        List<Vector2> path = new();
+        path.Add(new(minDelta.X, minDelta.Y));
+        var closed = false;
+        while (!closed)
+        {
+
+        }
     }
 }
