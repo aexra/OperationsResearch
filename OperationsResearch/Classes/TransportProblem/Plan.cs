@@ -128,6 +128,7 @@ public class Plan
     {
         // Находим минимальную дельта оценку и ее координату
         var deltas = GetIndirectCosts();
+        LogService.Log("Dij:\n" + deltas.ToLongString());
         Vector3 minDelta = new(500, 500, 500);
         for (var i = 0; i < deltas.Length; i++)
         {
