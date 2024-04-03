@@ -146,6 +146,10 @@ public class TransportProblem : ICloneable
     {
         return GetInitialPlan().Path.Select(x => (int)x.Z * (int)x.W).Sum();
     }
+    public void GetUVPotentials(out int[] us, out int[] vs)
+    {
+        GetUVPotentials(GetInitialPlan(), out us, out vs);
+    }
     public void GetUVPotentials(Plan plan, out int[] us, out int[] vs)
     {
         var us_t = new int?[plan.Mask.Length];
@@ -174,10 +178,40 @@ public class TransportProblem : ICloneable
         us = us_t.Cast<int>().ToArray();
         vs = vs_t.Cast<int>().ToArray();
     }
-    //public object[][] GetIndirectCosts()
-    //{
+    public object[][] GetIndirectCosts()
+    {
+        var plan = GetInitialPlan();
+        GetUVPotentials(plan, out var us, out var vs);
+        return GetIndirectCosts(plan, us, vs);
+    }
+    public object[][] GetIndirectCosts(Plan plan, int[] us, int[] vs)
+    {
+        var mask = new object[us.Length][];
+        for (var i = 0; i < us.Length; i++)
+        {
+            mask[i] = new object[vs.Length];
+        }
 
-    //}
+        // Заполним Х все базисные точки
+        foreach (var cell in plan.Path)
+        {
+            mask[(int)cell.Y][(int)cell.X] = 'x';
+        }
+
+        // Рассчитаем Dij для каждой небазисной точки
+        for (var i = 0; i < mask.Length; i++)
+        {
+            for (var j = 0; j < mask[i].Length; j++)
+            {
+                if (!(mask[i][j] is char))
+                {
+                    mask[i][j] = GetCost(i, j) - (us[i] + vs[j]);
+                }
+            }
+        }
+
+        return mask;
+    }
 
     // NODES MANIPULATION METHODS
     public void CreateMutualLink(int p, int c, int cost)
@@ -247,6 +281,10 @@ public class TransportProblem : ICloneable
     public int GetCost(NodeBase n1, NodeBase n2)
     {
         return n1.Links.Find(x => x.Right == n2).Cost;
+    }
+    public int GetCost(int p, int c)
+    {
+        return Providers[p].Links.Find(x => x.Right == Consumers[c]).Cost;
     }
 
     // INTERFACE IMPLEMENTATION
