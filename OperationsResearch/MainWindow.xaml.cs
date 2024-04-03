@@ -71,7 +71,18 @@ public sealed partial class MainWindow : Window
 
         LogService.Log(problem.GetTableString());
 
-        problem.Normalize();
+        switch(problem.Normalize())
+        {
+            case Enums.TransportProblemNormalizationResult.Match:
+                LogService.Log("Как видно, суммарная потребность груза в пунктах назначения совпадает с запасами груза на базах, а значит необходимое и достаточное условие условие разрешимости задачи выполняется");
+                break;
+            case Enums.TransportProblemNormalizationResult.Deficiency:
+                LogService.Log("Как видно, суммарная потребность груза в пунктах назначения превышает запасы груза на базах. Следовательно, модель исходной транспортной задачи является открытой. Чтобы получить закрытую модель, введем дополнительную (фиктивную) базу");
+                break;
+            case Enums.TransportProblemNormalizationResult.Excess:
+                LogService.Log("Как видно, суммарная потребность груза в пунктах назначения меньше запасов груза на базах. Следовательно, модель исходной транспортной задачи является открытой. Чтобы получить закрытую модель, введем дополнительную (фиктивную) потребность");
+                break;
+        }
         LogService.Log(problem.GetTableString());
 
         var path = problem.GetInitialPlanMask(out var mask);
