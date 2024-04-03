@@ -92,10 +92,10 @@ public sealed partial class MainWindow : Window
 
         LogService.Log($"Путь алгоритма:\n{string.Join("\n", plan.Path.Select(x => $"(i,j)=({x.Y}, {x.X}), min={x.Z}, Cij={x.W}"))}");
 
-        problem.GetUVPotentials(plan, out var us, out var vs);
+        plan.GetUVPotentials(out var us, out var vs);
         LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");
 
-        var ic = problem.GetIndirectCosts(plan, us, vs);
+        var ic = plan.GetIndirectCosts();
         LogService.Log("Dij:\n" + ic.ToLongString());
     }
 

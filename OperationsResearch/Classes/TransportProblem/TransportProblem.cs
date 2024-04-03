@@ -140,77 +140,11 @@ public class TransportProblem : ICloneable
             if (x == requests.Length || y == capacity.Length) break;
         }
 
-        return new(mask, path);
+        return new(this, mask, path);
     }
     public int GetInitialTargetValue()
     {
         return GetInitialPlan().Path.Select(x => (int)x.Z * (int)x.W).Sum();
-    }
-    public void GetUVPotentials(out int[] us, out int[] vs)
-    {
-        GetUVPotentials(GetInitialPlan(), out us, out vs);
-    }
-    public void GetUVPotentials(Plan plan, out int[] us, out int[] vs)
-    {
-        var us_t = new int?[plan.Mask.Length];
-        var vs_t = new int?[plan.Mask[0].Length];
-
-        us_t[0] = 0;
-        var solved = false;
-        while (!solved)
-        {
-            solved = true;
-            foreach (var cell in plan.Path)
-            {
-                if (us_t[(int)cell.Y] != null && vs_t[(int)cell.X] == null)
-                {
-                    vs_t[(int)cell.X] = new IntEquation2(us_t[(int)cell.Y], vs_t[(int)cell.X], (int)cell.W).Solve();
-                    solved = false;
-                }
-                else if (us_t[(int)cell.Y] == null && vs_t[(int)cell.X] != null)
-                {
-                    us_t[(int)cell.Y] = new IntEquation2(us_t[(int)cell.Y], vs_t[(int)cell.X], (int)cell.W).Solve();
-                    solved = false;
-                }
-            }
-        }
-
-        us = us_t.Cast<int>().ToArray();
-        vs = vs_t.Cast<int>().ToArray();
-    }
-    public object[][] GetIndirectCosts()
-    {
-        var plan = GetInitialPlan();
-        GetUVPotentials(plan, out var us, out var vs);
-        return GetIndirectCosts(plan, us, vs);
-    }
-    public object[][] GetIndirectCosts(Plan plan, int[] us, int[] vs)
-    {
-        var mask = new object[us.Length][];
-        for (var i = 0; i < us.Length; i++)
-        {
-            mask[i] = new object[vs.Length];
-        }
-
-        // Заполним Х все базисные точки
-        foreach (var cell in plan.Path)
-        {
-            mask[(int)cell.Y][(int)cell.X] = 'x';
-        }
-
-        // Рассчитаем Dij для каждой небазисной точки
-        for (var i = 0; i < mask.Length; i++)
-        {
-            for (var j = 0; j < mask[i].Length; j++)
-            {
-                if (!(mask[i][j] is char))
-                {
-                    mask[i][j] = GetCost(i, j) - (us[i] + vs[j]);
-                }
-            }
-        }
-
-        return mask;
     }
 
     // NODES MANIPULATION METHODS

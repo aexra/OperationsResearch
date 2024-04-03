@@ -10,9 +10,11 @@ public class Plan
 {
     public object[][] Mask;
     public List<Vector4> Path;
+    public TransportProblem Problem;
 
-    public Plan(object[][] mask, List<Vector4> path)
+    public Plan(TransportProblem problem, object[][] mask, List<Vector4> path)
     {
+        Problem = problem;
         Mask = mask;
         Path = path;
     }
@@ -29,4 +31,81 @@ public class Plan
         }
         return s;
     }
+    public void GetUVPotentials(out int[] us, out int[] vs)
+    {
+        var us_t = new int?[Mask.Length];
+        var vs_t = new int?[Mask[0].Length];
+
+        us_t[0] = 0;
+        var solved = false;
+        while (!solved)
+        {
+            solved = true;
+            foreach (var cell in Path)
+            {
+                if (us_t[(int)cell.Y] != null && vs_t[(int)cell.X] == null)
+                {
+                    vs_t[(int)cell.X] = new IntEquation2(us_t[(int)cell.Y], vs_t[(int)cell.X], (int)cell.W).Solve();
+                    solved = false;
+                }
+                else if (us_t[(int)cell.Y] == null && vs_t[(int)cell.X] != null)
+                {
+                    us_t[(int)cell.Y] = new IntEquation2(us_t[(int)cell.Y], vs_t[(int)cell.X], (int)cell.W).Solve();
+                    solved = false;
+                }
+            }
+        }
+
+        us = us_t.Cast<int>().ToArray();
+        vs = vs_t.Cast<int>().ToArray();
+    }
+    public object[][] GetIndirectCosts()
+    {
+        GetUVPotentials(out var us, out var vs);
+
+        var mask = new object[us.Length][];
+        for (var i = 0; i < us.Length; i++)
+        {
+            mask[i] = new object[vs.Length];
+        }
+
+        // Заполним Х все базисные точки
+        foreach (var cell in Path)
+        {
+            mask[(int)cell.Y][(int)cell.X] = 'x';
+        }
+
+        // Рассчитаем Dij для каждой небазисной точки
+        for (var i = 0; i < mask.Length; i++)
+        {
+            for (var j = 0; j < mask[i].Length; j++)
+            {
+                if (!(mask[i][j] is char))
+                {
+                    mask[i][j] = Problem.GetCost(i, j) - (us[i] + vs[j]);
+                }
+            }
+        }
+
+        return mask;
+    }
+    public bool IsOptimal()
+    {
+        List<int> deltas = new();
+        GetIndirectCosts().ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
+        return deltas.Exists(x => x < 0);
+    }
+    public void Improve()
+    {
+        var depth = 1000;
+        while (depth > 0 && !IsOptimal())
+        {
+            // Создаю цикл пересчета и меняю таблицу
+
+
+            // 
+            depth--;
+        }
+    }
+
 }
