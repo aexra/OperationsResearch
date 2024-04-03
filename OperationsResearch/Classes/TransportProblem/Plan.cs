@@ -128,7 +128,7 @@ public class Plan
             depth--;
         }
     }
-    public void Cycle()
+    private void Cycle()
     {
         // Находим минимальную дельта оценку и ее координату
         var deltas = GetIndirectCosts();
