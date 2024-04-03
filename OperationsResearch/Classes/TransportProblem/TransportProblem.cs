@@ -146,31 +146,38 @@ public class TransportProblem : ICloneable
     {
         return GetInitialPlan().Path.Select(x => (int)x.Z * (int)x.W).Sum();
     }
-    public void GetUVPotentials(Plan plan, out int?[] us, out int?[] vs)
+    public void GetUVPotentials(Plan plan, out int[] us, out int[] vs)
     {
-        us = new int?[plan.Mask.Length];
-        vs = new int?[plan.Mask[0].Length];
+        var us_t = new int?[plan.Mask.Length];
+        var vs_t = new int?[plan.Mask[0].Length];
 
-        us[0] = 0;
+        us_t[0] = 0;
         var solved = false;
         while (!solved)
         {
             solved = true;
             foreach (var cell in plan.Path)
             {
-                if (us[(int)cell.Y] != null && vs[(int)cell.X] == null)
+                if (us_t[(int)cell.Y] != null && vs_t[(int)cell.X] == null)
                 {
-                    vs[(int)cell.X] = new IntEquation2(us[(int)cell.Y], vs[(int)cell.X], (int)cell.W).Solve();
+                    vs_t[(int)cell.X] = new IntEquation2(us_t[(int)cell.Y], vs_t[(int)cell.X], (int)cell.W).Solve();
                     solved = false;
                 }
-                else if (us[(int)cell.Y] == null && vs[(int)cell.X] != null)
+                else if (us_t[(int)cell.Y] == null && vs_t[(int)cell.X] != null)
                 {
-                    us[(int)cell.Y] = new IntEquation2(us[(int)cell.Y], vs[(int)cell.X], (int)cell.W).Solve();
+                    us_t[(int)cell.Y] = new IntEquation2(us_t[(int)cell.Y], vs_t[(int)cell.X], (int)cell.W).Solve();
                     solved = false;
                 }
             }
         }
+
+        us = us_t.Cast<int>().ToArray();
+        vs = vs_t.Cast<int>().ToArray();
     }
+    //public object[][] GetIndirectCosts()
+    //{
+
+    //}
 
     // NODES MANIPULATION METHODS
     public void CreateMutualLink(int p, int c, int cost)
