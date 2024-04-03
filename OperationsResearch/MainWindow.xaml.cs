@@ -94,6 +94,9 @@ public sealed partial class MainWindow : Window
 
         problem.GetUVPotentials(plan, out var us, out var vs);
         LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");
+
+        var ic = problem.GetIndirectCosts(plan, us, vs);
+        LogService.Log("Dij:\n" + ic.ToLongString());
     }
 
     // BUTTON CLICK EVENTS

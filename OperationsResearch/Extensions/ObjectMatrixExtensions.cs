@@ -15,10 +15,7 @@ public static class ObjectMatrixExtensions
         {
             if (i != 0) s += "\n";
             s += "[ ";
-            for (var j = 0; j < a[i].Length; j++)
-            {
-                s += a[i][j].ToString() + ", ";
-            }
+            s += string.Join(",\t", a[i]);
             s += "]";
         }
 
