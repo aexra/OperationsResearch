@@ -101,11 +101,29 @@ public class Plan
         while (depth > 0 && !IsOptimal())
         {
             // Создаю цикл пересчета и меняю таблицу
-
+            Cycle();
 
             // 
             depth--;
         }
     }
+    public void Cycle()
+    {
+        // Находим минимальную дельта оценку и ее координату
+        var deltas = GetIndirectCosts();
+        Vector3 minDelta = new(500, 500, 500);
+        for (var i = 0; i < deltas.Length; i++)
+        {
+            for (var j = 0; j < deltas[i].Length; j++)
+            {
+                if (deltas[i][j] is int && (int)deltas[i][j] < minDelta.Z)
+                {
+                    minDelta = new(i, j, (int)deltas[i][j]);
+                }
+            }
+        }
+    
+        // Начинаем цикл из нее
 
+    }
 }
