@@ -1,4 +1,5 @@
-﻿using OperationsResearch.Extensions;
+﻿using ABI.System.Collections.Generic;
+using OperationsResearch.Extensions;
 using OperationsResearch.Services;
 using System;
 using System.Collections.Generic;
@@ -127,6 +128,75 @@ public class Plan
 
         // Начинаем цикл из нее
         
+    }
+    private bool GetCycle(Vector2 start, bool direction, List<Vector2> path, out List<Vector2> closed_path)
+    {
+        if (path == null)
+        {            
+            // Пробуем найти точки по горизонтали (true) и вертикали (false)
+            foreach (var v in Path)
+            {
+                // -
+                if ((int)v.X == (int)start.X)
+                {
+                    var n_path = new List<Vector2> { new(v.X, v.Y) };
+                    if (GetCycle(start, false, n_path, out closed_path)) return true;
+                }
+                // |
+                if ((int)v.Y == (int)start.Y)
+                {
+                    var n_path = new List<Vector2> { new(v.X, v.Y) };
+                    if (GetCycle(start, false, n_path, out closed_path)) return true;
+                }
+            }
+
+            // Если мы никуда не смогли отсюда даже пойти, сразу вернем false
+            closed_path = null;
+            return false;
+        }
+        else
+        {
+            var prev = path.Last();
+
+            if (prev.X == start.X && prev.Y == start.Y)
+            {
+                path.Remove(prev);
+                closed_path = path;
+                return true;
+            }
+
+            // Ищем в горизонтали
+            if (direction)
+            {
+                foreach (var v in Path)
+                {
+                    if (path.Exists(vec => vec.X == v.X && vec.Y == v.Y)) continue;
+                    if (v.Y == prev.Y)
+                    {
+                        var n_path = new List<Vector2>();
+                        foreach (var vec in path) { n_path.Add(vec); }
+                        if (GetCycle(start, false, n_path, out closed_path)) return true;
+                    }
+                }
+            }
+            // Ищем в вертикали
+            else
+            {
+                foreach (var v in Path)
+                {
+                    if (path.Exists(vec => vec.X == v.X && vec.Y == v.Y)) continue;
+                    if (v.X == prev.X)
+                    {
+                        var n_path = new List<Vector2>();
+                        foreach (var vec in path) { n_path.Add(vec); }
+                        if (GetCycle(start, true, n_path, out closed_path)) return true;
+                    }
+                }
+            }
+
+            closed_path = null;
+            return false;
+        }
     }
     public int GetTargetValue()
     {
