@@ -98,13 +98,12 @@ public class Plan
         GetIndirectCosts().ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
         return !deltas.Exists(x => x < 0);
     }
-    public bool Improve()
+    public bool Improve(int depth = 100)
     {
-        var depth = 100;
         while (depth > 0 && !IsOptimal())
         {
             // Создаю цикл пересчета и меняю таблицу
-            if (Cycle()) return false;
+            if (!Cycle()) return false;
 
             // 
             depth--;
@@ -131,9 +130,64 @@ public class Plan
         if (GetCycle(new(minDelta.X, minDelta.Y), null, null, out var closed_path, 10))
         {
             closed_path.Insert(0, new(minDelta.X, minDelta.Y));
-
             LogService.Log(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
 
+            List<Vector2> negative = new();
+            for (var i = 1; i < closed_path.Count; i += 2)
+            {
+                negative.Add(closed_path[i]);
+            }
+            List<Vector2> positive = new();
+            for (var i = 2; i < closed_path.Count - 1; i += 2)
+            {
+                negative.Add(closed_path[i]);
+            }
+
+            // Получим "минимальный" базис среди тех что будут подвергнуты уменьшению
+            //var minn = negative.Select(v => Path.Find(p => p.X == v.X && p.Y == v.Y).Z).Min();
+            Vector3 minn = new(-1, -1, 5);
+            foreach (var neg in negative)
+            {
+                foreach (var v in Path)
+                {
+                    if (v.X == neg.X && v.Y == neg.Y)
+                    {
+                        if (v.Z < minn.Z) minn = new(v.X, v.Y, v.Z); 
+                        break;
+                    }
+                }
+            }
+
+            // Уберем его из пути и из ... вообще
+            Path.Remove(Path.Find(v => v.X == minn.X && v.Y == minn.Y));
+            negative.Remove(negative.Find(v => v.X == minn.X && v.Y == minn.Y));
+
+            // Добавим новый в точке minDelta
+            Path.Add(new(minDelta.X, minDelta.Y, minn.Z, Problem.GetCost((int)minDelta.Y, (int)minDelta.X)));
+
+            // Изменим остальные значения
+            foreach (var neg in negative)
+            {
+                for (var i = 0; i < Path.Count; i++)
+                {
+                    if (Path[i].X == neg.X && Path[i].Y == neg.Y)
+                    {
+                        Path[i] = new(Path[i].X, Path[i].Y, Path[i].Z - minn.Z, Path[i].W);
+                    }
+                }
+            }
+            foreach (var pos in positive)
+            {
+                for (var i = 0; i < Path.Count; i++)
+                {
+                    if (Path[i].X == pos.X && Path[i].Y == pos.Y)
+                    {
+                        Path[i] = new(Path[i].X, Path[i].Y, Path[i].Z + minn.Z, Path[i].W);
+                    }
+                }
+            }
+
+            // Вернем true, что значит что мы внесли изменения в базис
             return true;
         }
         else
