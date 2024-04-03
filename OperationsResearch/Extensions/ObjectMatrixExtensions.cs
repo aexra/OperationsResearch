@@ -21,4 +21,18 @@ public static class ObjectMatrixExtensions
 
         return s;
     }
+    public static string ToLongString(this int[][] a)
+    {
+        var s = "";
+
+        for (var i = 0; i < a.Length; i++)
+        {
+            if (i != 0) s += "\n";
+            s += "[ ";
+            s += string.Join(",\t", a[i]);
+            s += "]";
+        }
+
+        return s;
+    }
 }

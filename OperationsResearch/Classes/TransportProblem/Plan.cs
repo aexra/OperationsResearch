@@ -1,4 +1,6 @@
-﻿using System;
+﻿using OperationsResearch.Extensions;
+using OperationsResearch.Services;
+using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
@@ -30,7 +32,7 @@ public class Plan
             {
                 if (mask[y][x] is char)
                 {
-                    Values[y][x] = (int)path.Find(v => v.X == x && v.Y == y).W;
+                    Values[y][x] = Problem.GetCost(y, x);
                 }
                 else
                 {
@@ -54,8 +56,8 @@ public class Plan
     }
     public void GetUVPotentials(out int[] us, out int[] vs)
     {
-        var us_t = new int?[Mask.Length];
-        var vs_t = new int?[Mask[0].Length];
+        var us_t = new int?[Values.Length];
+        var vs_t = new int?[Values[0].Length];
 
         us_t[0] = 0;
         var solved = false;
@@ -103,7 +105,7 @@ public class Plan
             {
                 if (!(mask[i][j] is char))
                 {
-                    mask[i][j] = Problem.GetCost(i, j) - (us[i] + vs[j]);
+                    mask[i][j] = Values[i][j] - (us[i] + vs[j]);
                 }
             }
         }
