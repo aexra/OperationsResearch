@@ -4,6 +4,7 @@ using System;
 using System.Collections.Generic;
 using System.Linq;
 using System.Numerics;
+using Windows.ApplicationModel.VoiceCommands;
 using Windows.Foundation.Collections;
 using Windows.Storage.Streams;
 
@@ -123,7 +124,7 @@ public class TransportProblem : ICloneable
             // Перемещаем курсор
             if (requests[x] == 0)
             {
-                if (mask[y][x + 1] is char)
+                if (x+1 <= Consumers.Count - 1 && mask[y][x + 1] is char)
                 {
                     y++;
                 }
@@ -136,8 +137,7 @@ public class TransportProblem : ICloneable
 
             // Какие-то странные условия выхода мне лень проверять что из этого не нужно
             if (x >= requests.Length) { x = 0; y++; }
-            //if (y >= capacity.Length) { y--; }
-            if (x == requests.Length - 1 && y == capacity.Length - 1) break;
+            if (x == requests.Length || y == capacity.Length) break;
         }
 
         return new(mask, path);
@@ -145,6 +145,31 @@ public class TransportProblem : ICloneable
     public int GetInitialTargetValue()
     {
         return GetInitialPlan().Path.Select(x => (int)x.Z * (int)x.W).Sum();
+    }
+    public void GetUVPotentials(Plan plan, out int?[] us, out int?[] vs)
+    {
+        us = new int?[plan.Mask.Length];
+        vs = new int?[plan.Mask[0].Length];
+
+        us[0] = 0;
+        var solved = false;
+        while (!solved)
+        {
+            solved = true;
+            foreach (var cell in plan.Path)
+            {
+                if (us[(int)cell.Y] != null && vs[(int)cell.X] == null)
+                {
+                    vs[(int)cell.X] = new IntEquation2(us[(int)cell.Y], vs[(int)cell.X], (int)cell.W).Solve();
+                    solved = false;
+                }
+                else if (us[(int)cell.Y] == null && vs[(int)cell.X] != null)
+                {
+                    us[(int)cell.Y] = new IntEquation2(us[(int)cell.Y], vs[(int)cell.X], (int)cell.W).Solve();
+                    solved = false;
+                }
+            }
+        }
     }
 
     // NODES MANIPULATION METHODS
