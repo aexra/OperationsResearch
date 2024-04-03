@@ -7,37 +7,51 @@ using System.Linq;
 using System.Numerics;
 using System.Text;
 using System.Threading.Tasks;
+using Windows.Networking.Connectivity;
 
 namespace OperationsResearch.Classes.TransportProblem;
 public class Plan
 {
-    public object[][] Mask;
+    public string Mask => GetPlanString();
     public List<Vector4> Path;
     public TransportProblem Problem;
 
-    public Plan(TransportProblem problem, object[][] mask, List<Vector4> path)
+    public Plan(TransportProblem problem, List<Vector4> path)
     {
         Problem = problem;
-        Mask = mask;
         Path = path;
     }
 
-    public int BasisCount()
+    public string GetPlanString()
     {
-        var s = 0;
-        foreach (var r in Mask)
+        var s = "";
+
+        var counter = 0;
+        for (var i_p = 0; i_p < Problem.Providers.Count; i_p++)
         {
-            foreach (var v in r)
+            s += $"{(counter != 0? "\n" : "")}[";
+            for (var i_c = 0; i_c < Problem.Consumers.Count; i_c++)
             {
-                if (!(v is char)) s++;
+                if (Path.Exists(v => v.X == i_c && v.Y == i_p))
+                {
+                    var cell = Path.Find(v => v.X == i_c && v.Y == i_p);
+                    s += $"{cell.W}|{cell.Z},\t";
+                }
+                else
+                {
+                    s += $"{Problem.GetCost(i_p, i_c)},\t";
+                }
             }
+            s += "]";
+            counter++;
         }
+
         return s;
     }
     public void GetUVPotentials(out int[] us, out int[] vs)
     {
-        var us_t = new int?[Mask.Length];
-        var vs_t = new int?[Mask[0].Length];
+        var us_t = new int?[Problem.Providers.Count];
+        var vs_t = new int?[Problem.Consumers.Count];
 
         us_t[0] = 0;
         var solved = false;

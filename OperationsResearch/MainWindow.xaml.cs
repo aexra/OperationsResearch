@@ -87,7 +87,7 @@ public sealed partial class MainWindow : Window
 
         var plan = problem.GetInitialPlan();
 
-        LogService.Log(plan.Mask.ToLongString());
+        LogService.Log(plan.Mask);
         LogService.Log($"Путь алгоритма:\n{string.Join("\n", plan.Path.Select(x => $"(i,j)=({x.Y}, {x.X}), min={x.Z}, Cij={x.W}"))}");
         LogService.Log($"Начальное целевое значение: {plan.GetTargetValue()}");
 
@@ -97,13 +97,14 @@ public sealed partial class MainWindow : Window
         var ic = plan.GetIndirectCosts();
         LogService.Log("Dij:\n" + ic.ToLongString());
 
-        if (!plan.Improve(100))
+        if (!plan.Improve(1))
         {
             LogService.Warning("Не удалось улучшить план методом потенциалов");
         }
         else
         {
             LogService.Log("План успешно улучшен методом потенциалов");
+            LogService.Log(plan.Mask);
             LogService.Log($"Улучшенное целевое значение: {plan.GetTargetValue()}");
         }
     }

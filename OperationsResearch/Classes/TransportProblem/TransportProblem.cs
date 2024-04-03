@@ -140,7 +140,7 @@ public class TransportProblem : ICloneable
             if (x == requests.Length || y == capacity.Length) break;
         }
 
-        return new(this, mask, path);
+        return new(this, path);
     }
     public int GetInitialTargetValue()
     {
