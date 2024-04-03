@@ -104,9 +104,8 @@ public sealed partial class MainWindow : Window
         else
         {
             LogService.Log("План успешно улучшен методом потенциалов");
+            LogService.Log($"Улучшенное целевое значение: {plan.GetTargetValue()}");
         }
-
-        LogService.Log($"Улучшенное целевое значение: {plan.GetTargetValue()}");
     }
 
     // BUTTON CLICK EVENTS

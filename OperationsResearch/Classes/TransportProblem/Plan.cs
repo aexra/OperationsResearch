@@ -130,7 +130,10 @@ public class Plan
         // Начинаем цикл из нее
         if (GetCycle(new(minDelta.X, minDelta.Y), null, null, out var closed_path, 10))
         {
-            LogService.Error(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
+            closed_path.Insert(0, new(minDelta.X, minDelta.Y));
+
+            LogService.Log(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
+
             return true;
         }
         else
