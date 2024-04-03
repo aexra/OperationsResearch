@@ -110,7 +110,6 @@ public class Plan
     {
         List<int> deltas = new();
         GetIndirectCosts().ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
-        LogService.Error(!deltas.Exists(x => x < 0));
         return !deltas.Exists(x => x < 0);
     }
     public bool Improve(int depth = 100)
@@ -147,7 +146,7 @@ public class Plan
             closed_path.Insert(0, new(minDelta.X, minDelta.Y));
             closed_path.Add(new(minDelta.X, minDelta.Y));
             LogService.Log(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
-            closed_path.Remove(closed_path.Last());
+            closed_path.RemoveAt(closed_path.Count - 1);
 
             List<Vector2> negative = new();
             for (var i = 1; i < closed_path.Count; i += 2)
