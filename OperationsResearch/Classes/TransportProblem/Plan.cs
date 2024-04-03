@@ -98,20 +98,20 @@ public class Plan
         GetIndirectCosts().ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
         return !deltas.Exists(x => x < 0);
     }
-    public void Improve()
+    public bool Improve()
     {
-        var depth = 1000;
-        //while (depth > 0 && !IsOptimal())
-        //{
-        //    // Создаю цикл пересчета и меняю таблицу
-        //    Cycle();
+        var depth = 100;
+        while (depth > 0 && !IsOptimal())
+        {
+            // Создаю цикл пересчета и меняю таблицу
+            if (Cycle()) return false;
 
-        //    // 
-        //    depth--;
-        //}
-        Cycle();
+            // 
+            depth--;
+        }
+        return true;
     }
-    private void Cycle()
+    private bool Cycle()
     {
         // Находим минимальную дельта оценку и ее координату
         var deltas = GetIndirectCosts();
@@ -131,10 +131,12 @@ public class Plan
         if (GetCycle(new(minDelta.X, minDelta.Y), null, null, out var closed_path, 10))
         {
             LogService.Error(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
+            return true;
         }
         else
         {
-            LogService.Warning("1");
+            LogService.Error("Цикл не найден");
+            return false;
         }
     }
     private bool GetCycle(Vector2 start, bool? direction, List<Vector2> path, out List<Vector2> closed_path, int depth)

@@ -89,7 +89,7 @@ public sealed partial class MainWindow : Window
 
         LogService.Log(plan.Mask.ToLongString());
         LogService.Log($"Путь алгоритма:\n{string.Join("\n", plan.Path.Select(x => $"(i,j)=({x.Y}, {x.X}), min={x.Z}, Cij={x.W}"))}");
-        LogService.Log($"Начальное целевое значение: {problem.GetInitialTargetValue()}");
+        LogService.Log($"Начальное целевое значение: {plan.GetTargetValue()}");
 
         plan.GetUVPotentials(out var us, out var vs);
         LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");
@@ -97,7 +97,16 @@ public sealed partial class MainWindow : Window
         var ic = plan.GetIndirectCosts();
         LogService.Log("Dij:\n" + ic.ToLongString());
 
-        plan.Improve();
+        if (!plan.Improve())
+        {
+            LogService.Warning("Не удалось улучшить план методом потенциалов");
+        }
+        else
+        {
+            LogService.Log("План успешно улучшен методом потенциалов");
+        }
+
+        LogService.Log($"Улучшенное целевое значение: {plan.GetTargetValue()}");
     }
 
     // BUTTON CLICK EVENTS
