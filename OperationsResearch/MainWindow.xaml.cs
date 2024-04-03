@@ -49,18 +49,33 @@ public sealed partial class MainWindow : Window
             }
         );
     }
+    // WEIRD PROBLEM
+    private TransportProblem GetVariantWeird()
+    {
+        return new(
+            new int[] { 14, 20, 33 },
+            new int[] { 50, 100, 200 },
+            new int[][] {
+                new int[] { 1, 1, 1 },
+                new int[] { 1, 1, 1 },
+                new int[] { 1, 1, 1 }
+            }
+        );
+    }
 
     /// SOME WEIRD STUFF GOES HERE
     // BASE METHOD TO OUTPUT SOLUTION
     private void Solve(TransportProblem problem)
     {
+        LogService.Log("\n===============================\n");
+
         LogService.Log(problem.GetTableString());
 
         problem.Normalize();
         LogService.Log(problem.GetTableString());
 
         var path = problem.GetInitialPlanMask(out var mask);
-        path.ForEach(x => LogService.Log(x.ToLongString()));
+        //path.ForEach(x => LogService.Log(x.ToLongString()));
 
         LogService.Log(mask.ToLongString());
         LogService.Log($"Начальное целевое значение: {problem.GetInitialTargetValue()}");
@@ -78,5 +93,9 @@ public sealed partial class MainWindow : Window
     private void SolveMaksButton_Click(object sender, RoutedEventArgs e)
     {
         Solve(GetVariantMaks());
+    }
+    private void SolveWeirdButton_Click(object sender, RoutedEventArgs e)
+    {
+        Solve(GetVariantWeird());
     }
 }
