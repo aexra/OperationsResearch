@@ -97,7 +97,7 @@ public sealed partial class MainWindow : Window
         var ic = plan.GetIndirectCosts();
         LogService.Log("Dij:\n" + ic.ToLongString());
 
-        if (!plan.Improve(1))
+        if (!plan.Improve(100))
         {
             LogService.Warning("Не удалось улучшить план методом потенциалов");
         }

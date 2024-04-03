@@ -110,6 +110,7 @@ public class Plan
     {
         List<int> deltas = new();
         GetIndirectCosts().ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
+        LogService.Error(!deltas.Exists(x => x < 0));
         return !deltas.Exists(x => x < 0);
     }
     public bool Improve(int depth = 100)
@@ -144,7 +145,9 @@ public class Plan
         if (GetCycle(new(minDelta.X, minDelta.Y), null, null, out var closed_path, 10))
         {
             closed_path.Insert(0, new(minDelta.X, minDelta.Y));
+            closed_path.Add(new(minDelta.X, minDelta.Y));
             LogService.Log(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
+            closed_path.Remove(closed_path.Last());
 
             List<Vector2> negative = new();
             for (var i = 1; i < closed_path.Count; i += 2)
@@ -152,14 +155,17 @@ public class Plan
                 negative.Add(closed_path[i]);
             }
             List<Vector2> positive = new();
-            for (var i = 2; i < closed_path.Count - 1; i += 2)
+            for (var i = 2; i < closed_path.Count; i += 2)
             {
-                negative.Add(closed_path[i]);
+                positive.Add(closed_path[i]);
             }
+
+            //LogService.Error(negative.Count);
+            //LogService.Error(positive.Count);
 
             // Получим "минимальный" базис среди тех что будут подвергнуты уменьшению
             //var minn = negative.Select(v => Path.Find(p => p.X == v.X && p.Y == v.Y).Z).Min();
-            Vector3 minn = new(-1, -1, 5);
+            Vector3 minn = new(-1, -1, Path.Find(v => v.X == negative.First().X && v.Y == negative.First().Y).Z);
             foreach (var neg in negative)
             {
                 foreach (var v in Path)
