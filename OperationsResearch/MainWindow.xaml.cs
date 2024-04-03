@@ -85,10 +85,9 @@ public sealed partial class MainWindow : Window
         }
         LogService.Log(problem.GetTableString());
 
-        var path = problem.GetInitialPlanMask(out var mask);
-        //path.ForEach(x => LogService.Log(x.ToLongString()));
+        var plan = problem.GetInitialPlan();
 
-        LogService.Log(mask.ToLongString());
+        LogService.Log(plan.Mask.ToLongString());
         LogService.Log($"Начальное целевое значение: {problem.GetInitialTargetValue()}");
     }
 

@@ -65,7 +65,7 @@ public class TransportProblem : ICloneable
             return TransportProblemNormalizationResult.Deficiency;
         }
     }
-    public List<Vector4> GetInitialPlanMask(out object[][] mask)
+    public Plan GetInitialPlan()
     {
         var path = new List<Vector4>();
 
@@ -73,7 +73,7 @@ public class TransportProblem : ICloneable
         var y = 0;
 
         // То что я буду редактировать
-        mask = new object[Providers.Count][];
+        var mask = new object[Providers.Count][];
         var capacity = Providers.Select(x => x.Cost).ToArray();
         var requests = Consumers.Select(x => x.Cost).ToArray();
 
@@ -130,11 +130,11 @@ public class TransportProblem : ICloneable
             if (x == requests.Length - 1 && y == capacity.Length - 1) break;
         }
 
-        return path;
+        return new(mask, path);
     }
     public int GetInitialTargetValue()
     {
-        return GetInitialPlanMask(out _).Select(x => (int)x.Z * (int)x.W).Sum();
+        return GetInitialPlan().Path.Select(x => (int)x.Z * (int)x.W).Sum();
     }
 
     // NODES MANIPULATION METHODS
