@@ -121,7 +121,17 @@ public class TransportProblem : ICloneable
             path.Add(new(x, y, min, (int)mask[y][x]));
 
             // Перемещаем курсор
-            if (requests[x] == 0) { x++; }
+            if (requests[x] == 0)
+            {
+                if (mask[y][x + 1] is char)
+                {
+                    y++;
+                }
+                else
+                {
+                    x++;
+                }
+            }
             else if (capacity[y] == 0) { y++; }
 
             // Какие-то странные условия выхода мне лень проверять что из этого не нужно
