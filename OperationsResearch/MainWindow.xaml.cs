@@ -96,6 +96,8 @@ public sealed partial class MainWindow : Window
 
         var ic = plan.GetIndirectCosts();
         LogService.Log("Dij:\n" + ic.ToLongString());
+
+        plan.Improve();
     }
 
     // BUTTON CLICK EVENTS

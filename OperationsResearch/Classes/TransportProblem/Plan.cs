@@ -96,19 +96,20 @@ public class Plan
     {
         List<int> deltas = new();
         GetIndirectCosts().ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
-        return deltas.Exists(x => x < 0);
+        return !deltas.Exists(x => x < 0);
     }
     public void Improve()
     {
         var depth = 1000;
-        while (depth > 0 && !IsOptimal())
-        {
-            // Создаю цикл пересчета и меняю таблицу
-            Cycle();
+        //while (depth > 0 && !IsOptimal())
+        //{
+        //    // Создаю цикл пересчета и меняю таблицу
+        //    Cycle();
 
-            // 
-            depth--;
-        }
+        //    // 
+        //    depth--;
+        //}
+        Cycle();
     }
     private void Cycle()
     {
@@ -127,26 +128,35 @@ public class Plan
         }
 
         // Начинаем цикл из нее
-        
+        if (GetCycle(new(minDelta.X, minDelta.Y), null, null, out var closed_path, 10))
+        {
+            LogService.Error(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
+        }
+        else
+        {
+            LogService.Warning("1");
+        }
     }
-    private bool GetCycle(Vector2 start, bool direction, List<Vector2> path, out List<Vector2> closed_path)
+    private bool GetCycle(Vector2 start, bool? direction, List<Vector2> path, out List<Vector2> closed_path, int depth)
     {
         if (path == null)
         {            
             // Пробуем найти точки по горизонтали (true) и вертикали (false)
             foreach (var v in Path)
             {
-                // -
+                // |
                 if ((int)v.X == (int)start.X)
                 {
                     var n_path = new List<Vector2> { new(v.X, v.Y) };
-                    if (GetCycle(start, false, n_path, out closed_path)) return true;
+                    //LogService.Log($"Сделал начальный переход из ({start.Y},{start.X}) в ({v.Y},{v.X})");
+                    if (GetCycle(start, true, n_path, out closed_path, depth - 1)) return true;
                 }
-                // |
+                // -
                 if ((int)v.Y == (int)start.Y)
                 {
                     var n_path = new List<Vector2> { new(v.X, v.Y) };
-                    if (GetCycle(start, false, n_path, out closed_path)) return true;
+                    //LogService.Log($"Сделал начальный переход из ({start.Y},{start.X}) в ({v.Y},{v.X})");
+                    if (GetCycle(start, false, n_path, out closed_path, depth - 1)) return true;
                 }
             }
 
@@ -156,26 +166,37 @@ public class Plan
         }
         else
         {
+            // Получим предудшую ячейку для удобства
             var prev = path.Last();
 
-            if (prev.X == start.X && prev.Y == start.Y)
+            // Нашли конец цикла?
+            if (path.Count > 2 && ((int)prev.X == (int)start.X || (int)prev.Y == (int)start.Y))
             {
-                path.Remove(prev);
+                //LogService.Error("gotcha");
                 closed_path = path;
                 return true;
             }
 
+            // Проверяем глубину поиска
+            if (depth <= 0)
+            {
+                closed_path = null;
+                return false;
+            }
+
             // Ищем в горизонтали
-            if (direction)
+            if (direction.Value)
             {
                 foreach (var v in Path)
-                {
-                    if (path.Exists(vec => vec.X == v.X && vec.Y == v.Y)) continue;
-                    if (v.Y == prev.Y)
+                { 
+                    if ((int)v.Y == (int)prev.Y)
                     {
+                        if (path.Exists(vec => (int)vec.X == (int)v.X && (int)vec.Y == (int)v.Y)) { continue; }
                         var n_path = new List<Vector2>();
                         foreach (var vec in path) { n_path.Add(vec); }
-                        if (GetCycle(start, false, n_path, out closed_path)) return true;
+                        n_path.Add(new(v.X, v.Y));
+                        //LogService.Log($"Сделал переход из ({prev.Y},{prev.X}) в ({v.Y},{v.X})");
+                        if (GetCycle(start, false, n_path, out closed_path, depth - 1)) return true;
                     }
                 }
             }
@@ -184,12 +205,14 @@ public class Plan
             {
                 foreach (var v in Path)
                 {
-                    if (path.Exists(vec => vec.X == v.X && vec.Y == v.Y)) continue;
-                    if (v.X == prev.X)
+                    if ((int)v.X == (int)prev.X)
                     {
+                        if (path.Exists(vec => (int)vec.X == (int)v.X && (int)vec.Y == (int)v.Y)) { continue; }
                         var n_path = new List<Vector2>();
                         foreach (var vec in path) { n_path.Add(vec); }
-                        if (GetCycle(start, true, n_path, out closed_path)) return true;
+                        n_path.Add(new(v.X, v.Y));
+                        //LogService.Log($"Сделал переход из ({prev.Y},{prev.X}) в ({v.Y},{v.X})");
+                        if (GetCycle(start, true, n_path, out closed_path, depth - 1)) return true;
                     }
                 }
             }
