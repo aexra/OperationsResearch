@@ -62,6 +62,19 @@ public sealed partial class MainWindow : Window
             }
         );
     }
+    // WEIRD PROBLEM
+    private TransportProblem GetVariantKirill()
+    {
+        return new(
+            new int[] { 300, 120, 300 },
+            new int[] { 100, 120, 130, 100, 90 },
+            new int[][] {
+                new int[] { 1, 4, 5, 3, 1 },
+                new int[] { 2, 1, 2, 1, 2 },
+                new int[] { 3, 1, 4, 2, 1 }
+            }
+        );
+    }
 
     /// SOME WEIRD STUFF GOES HERE
     // BASE METHOD TO OUTPUT SOLUTION
@@ -123,5 +136,10 @@ public sealed partial class MainWindow : Window
     private void SolveWeirdButton_Click(object sender, RoutedEventArgs e)
     {
         Solve(GetVariantWeird());
+    }
+
+    private void SolveKirillButton_Click(object sender, RoutedEventArgs e)
+    {
+        Solve(GetVariantKirill());
     }
 }
