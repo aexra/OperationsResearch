@@ -165,25 +165,33 @@ public class Plan
 
             // Получим "минимальный" базис среди тех что будут подвергнуты уменьшению
             //var minn = negative.Select(v => Path.Find(p => p.X == v.X && p.Y == v.Y).Z).Min();
-            Vector3 minn = new(-1, -1, Path.Find(v => v.X == negative.First().X && v.Y == negative.First().Y).Z);
+            Vector3? minn = null;
             foreach (var neg in negative)
             {
                 foreach (var v in Path)
                 {
                     if (v.X == neg.X && v.Y == neg.Y)
                     {
-                        if (v.Z < minn.Z) minn = new(v.X, v.Y, v.Z); 
-                        break;
+                        if (minn == null)
+                        {
+                            minn = new(v.X, v.Y, v.Z);
+                            continue;
+                        }
+                        else
+                        {
+                            if (v.Z < minn.Value.Z) minn = new(v.X, v.Y, v.Z);
+                            break;
+                        }
                     }
                 }
             }
 
             // Уберем его из пути и из ... вообще
-            Path.Remove(Path.Find(v => v.X == minn.X && v.Y == minn.Y));
-            negative.Remove(negative.Find(v => v.X == minn.X && v.Y == minn.Y));
+            Path.Remove(Path.Find(v => (v.X == minn.Value.X && v.Y == minn.Value.Y)));
+            negative.Remove(negative.Find(v => v.X == minn.Value.X && v.Y == minn.Value.Y));
 
             // Добавим новый в точке minDelta
-            Path.Add(new(minDelta.X, minDelta.Y, minn.Z, Problem.GetCost((int)minDelta.Y, (int)minDelta.X)));
+            Path.Add(new(minDelta.X, minDelta.Y, minn.Value.Z, Problem.GetCost((int)minDelta.Y, (int)minDelta.X)));
 
             // Изменим остальные значения
             foreach (var neg in negative)
@@ -192,7 +200,7 @@ public class Plan
                 {
                     if (Path[i].X == neg.X && Path[i].Y == neg.Y)
                     {
-                        Path[i] = new(Path[i].X, Path[i].Y, Path[i].Z - minn.Z, Path[i].W);
+                        Path[i] = new(Path[i].X, Path[i].Y, Path[i].Z - minn.Value.Z, Path[i].W);
                     }
                 }
             }
@@ -202,7 +210,7 @@ public class Plan
                 {
                     if (Path[i].X == pos.X && Path[i].Y == pos.Y)
                     {
-                        Path[i] = new(Path[i].X, Path[i].Y, Path[i].Z + minn.Z, Path[i].W);
+                        Path[i] = new(Path[i].X, Path[i].Y, Path[i].Z + minn.Value.Z, Path[i].W);
                     }
                 }
             }

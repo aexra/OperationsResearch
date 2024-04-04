@@ -94,13 +94,14 @@ public sealed partial class MainWindow : Window
         plan.GetUVPotentials(out var us, out var vs);
         LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");
 
-        if (!plan.Improve(100))
+        if (!plan.Improve(10))
         {
             LogService.Warning("Не удалось улучшить план методом потенциалов");
         }
         else
         {
             LogService.Log("План успешно улучшен методом потенциалов");
+            LogService.Log(plan.GetIndirectCosts().ToLongString());
             LogService.Log(plan.Mask);
             LogService.Log($"Улучшенное целевое значение: {plan.GetTargetValue()}");
         }
