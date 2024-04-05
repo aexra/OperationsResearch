@@ -48,7 +48,7 @@ public class Plan
 
         return s;
     }
-    public void GetUVPotentials(out int[] us, out int[] vs)
+    public void GetUVPotentials(out int[] us, out int[] vs, bool log = false)
     {
         var us_t = new int?[Problem.Providers.Count];
         var vs_t = new int?[Problem.Consumers.Count];
@@ -76,11 +76,11 @@ public class Plan
         us = us_t.Cast<int>().ToArray();
         vs = vs_t.Cast<int>().ToArray();
 
-        LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");
+        if (log) LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");
     }
-    public object[][] GetIndirectCosts()
+    public object[][] GetIndirectCosts(bool log = false)
     {
-        GetUVPotentials(out var us, out var vs);
+        GetUVPotentials(out var us, out var vs, log);
 
         var mask = new object[us.Length][];
         for (var i = 0; i < us.Length; i++)
@@ -106,14 +106,14 @@ public class Plan
             }
         }
 
+        if (log) LogService.Log("Дельта оценки:\n" + mask.ToLongString());
+
         return mask;
     }
     public bool IsOptimal()
     {
         List<int> deltas = new();
-        var costs = GetIndirectCosts();
-        LogService.Log(costs.ToLongString());
-        costs.ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
+        GetIndirectCosts(true).ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
         return !deltas.Exists(x => x < 0);
     }
     public bool Improve(int depth = 100)
