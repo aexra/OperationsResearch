@@ -106,14 +106,14 @@ public class Plan
             }
         }
 
-        LogService.Log("Дельта оценки:\n" + mask.ToLongString());
-
         return mask;
     }
     public bool IsOptimal()
     {
         List<int> deltas = new();
-        GetIndirectCosts().ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
+        var costs = GetIndirectCosts();
+        LogService.Log(costs.ToLongString());
+        costs.ToList().ForEach(mass => mass.Where(x => x is int).ToList().ForEach(x => deltas.Add((int)x)));
         return !deltas.Exists(x => x < 0);
     }
     public bool Improve(int depth = 100)
