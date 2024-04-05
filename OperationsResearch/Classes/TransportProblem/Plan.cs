@@ -123,6 +123,9 @@ public class Plan
             // Создаю цикл пересчета и меняю таблицу
             if (!Cycle()) return false;
 
+            // Выведем текущую целевую сумму
+            LogService.Log($"Текущее целевое значение = {GetTargetValue()}");
+
             // 
             depth--;
         }
@@ -149,7 +152,7 @@ public class Plan
         {
             closed_path.Insert(0, new(minDelta.X, minDelta.Y));
             closed_path.Add(new(minDelta.X, minDelta.Y));
-            LogService.Log(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")) + $" = {GetTargetValue()}");
+            LogService.Log(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
             closed_path.RemoveAt(closed_path.Count - 1);
 
             List<Vector2> negative = new();
