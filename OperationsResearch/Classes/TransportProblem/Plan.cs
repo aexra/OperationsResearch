@@ -75,6 +75,8 @@ public class Plan
 
         us = us_t.Cast<int>().ToArray();
         vs = vs_t.Cast<int>().ToArray();
+
+        LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");
     }
     public object[][] GetIndirectCosts()
     {
@@ -104,6 +106,8 @@ public class Plan
             }
         }
 
+        LogService.Log("Дельта оценки:\n" + mask.ToLongString());
+
         return mask;
     }
     public bool IsOptimal()
@@ -128,7 +132,6 @@ public class Plan
     {
         // Находим минимальную дельта оценку и ее координату
         var deltas = GetIndirectCosts();
-        LogService.Log("Dij:\n" + deltas.ToLongString());
         Vector3 minDelta = new(500, 500, 500);
         for (var i = 0; i < deltas.Length; i++)
         {
@@ -146,7 +149,7 @@ public class Plan
         {
             closed_path.Insert(0, new(minDelta.X, minDelta.Y));
             closed_path.Add(new(minDelta.X, minDelta.Y));
-            LogService.Log(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")));
+            LogService.Log(string.Join(" -> ", closed_path.Select(v => $"({v.Y},{v.X})")) + $" = {GetTargetValue()}");
             closed_path.RemoveAt(closed_path.Count - 1);
 
             List<Vector2> negative = new();

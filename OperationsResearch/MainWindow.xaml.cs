@@ -104,9 +104,6 @@ public sealed partial class MainWindow : Window
         LogService.Log($"Путь алгоритма:\n{string.Join("\n", plan.Path.Select(x => $"(i,j)=({x.Y}, {x.X}), min={x.Z}, Cij={x.W}"))}");
         LogService.Log($"Начальное целевое значение: {plan.GetTargetValue()}");
 
-        plan.GetUVPotentials(out var us, out var vs);
-        LogService.Log($"Потенциалы Ui: {string.Join(", ", us)}\nПотенциалы Vi: {string.Join(", ", vs)}");
-
         if (!plan.Improve(10))
         {
             LogService.Warning("Не удалось улучшить план методом потенциалов");
@@ -114,7 +111,6 @@ public sealed partial class MainWindow : Window
         else
         {
             LogService.Log("План успешно улучшен методом потенциалов");
-            LogService.Log(plan.GetIndirectCosts().ToLongString());
             LogService.Log(plan.Mask);
             LogService.Log($"Улучшенное целевое значение: {plan.GetTargetValue()}");
         }
