@@ -1,16 +1,9 @@
-using ABI.System.Collections.Generic;
-using CommunityToolkit.WinUI.UI.Controls.Primitives;
 using Microsoft.UI.Xaml;
 using OperationsResearch.Classes.TransportProblem;
-using OperationsResearch.Extensions;
 using OperationsResearch.Services;
-using OperationsResearch.Structures;
-using System;
-using System.Collections.Generic;
 using System.Data;
 using System.Linq;
-using System.Numerics;
-using System.Runtime.CompilerServices;
+using CanvasedGraph;
 
 namespace OperationsResearch;
 public sealed partial class MainWindow : Window
