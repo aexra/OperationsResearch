@@ -118,8 +118,12 @@ public class Plan
     }
     public bool Improve(int depth = 100)
     {
+        var iter = 0;
         while (depth > 0 && !IsOptimal())
         {
+            // Номер итерации
+            LogService.Log($"Итерация №{++iter}");
+
             // Создаю цикл пересчета и меняю таблицу
             if (!Cycle()) return false;
 
