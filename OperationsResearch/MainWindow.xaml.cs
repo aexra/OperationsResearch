@@ -3,7 +3,6 @@ using OperationsResearch.Classes.TransportProblem;
 using OperationsResearch.Services;
 using System.Data;
 using System.Linq;
-using CanvasedGraph;
 
 namespace OperationsResearch;
 public sealed partial class MainWindow : Window
@@ -126,7 +125,6 @@ public sealed partial class MainWindow : Window
     {
         Solve(GetVariantWeird());
     }
-
     private void SolveKirillButton_Click(object sender, RoutedEventArgs e)
     {
         Solve(GetVariantKirill());
