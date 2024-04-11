@@ -28,6 +28,20 @@ public sealed partial class MainWindow : Window
             }
         );
     }
+    // PROBLEM 1
+    private TransportProblem GetVariant1()
+    {
+        return new(
+            new int[] { 200, 150, 350 },
+            new int[] { 120, 120, 200, 180, 110 },
+            new int[][]
+            {
+                new int[] { 1, 2, 3, 5, 2 },
+                new int[] { 4, 6, 7, 3, 1 },
+                new int[] { 2, 2, 3, 4, 5 }
+            }
+        );
+    }
     // MASKIM FOMINTSEV'S PROBLEM
     private TransportProblem GetVariantMaks()
     {
@@ -128,5 +142,9 @@ public sealed partial class MainWindow : Window
     private void SolveKirillButton_Click(object sender, RoutedEventArgs e)
     {
         Solve(GetVariantKirill());
+    }
+    private void SolveV1Button_Click(object sender, RoutedEventArgs e)
+    {
+        Solve(GetVariant1());
     }
 }
